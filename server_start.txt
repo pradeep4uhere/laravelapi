@@ -1,0 +1,23 @@
+php -S localhost:8000 -t public
+OR
+php artisan serve
+
+//Change Default Port of Laravel
+php artisan serve --port=8005
+
+
+
+//Check if Port is already in used
+#sudo netstat -plnt
+
+Output
+=============================================
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:3000            0.0.0.0:*               LISTEN      4647/node       
+tcp        0      0 127.0.0.1:8000          0.0.0.0:*               LISTEN      3547/php        
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      1571/mysqld     
+
+
+#================Kill All Port============================
+killall -9 4647
