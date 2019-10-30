@@ -11,4 +11,8 @@ class Itinerary extends Model
         return $this->hasMany(ItineraryDeparture::class);
     }
 
+    public function ItineraryDay() {
+        return $this->hasMany(ItineraryDay::class);
+    }
+
 }

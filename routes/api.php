@@ -63,15 +63,21 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('deleteevent'        , 'API\EventController@deleteEvent');
 
     
-    Route::any('getitinerary'        , 'API\ItineraryController@getitinerary');
-    Route::any('additinerary'        , 'API\ItineraryController@addItinerary');
-    Route::any('allitinerary'        , 'API\ItineraryController@allItinerary');
-    Route::any('itineraryimageupload' , 'API\ItineraryController@imageupload');
+    Route::any('getitinerary'           , 'API\ItineraryController@getitinerary');
+    Route::any('additinerary'           , 'API\ItineraryController@addItinerary');
+    Route::any('allitinerary'           , 'API\ItineraryController@allItinerary');
+    Route::any('itineraryimageupload'   , 'API\ItineraryController@imageupload');
     Route::any('itineraryimagedefault'  , 'API\ItineraryController@defaultImage');
-    Route::any('itineraryimagedelete'  , 'API\ItineraryController@deleteImage');
-    Route::any('itinerarydeparture'  , 'API\ItineraryController@itineraryDepartureUpdate');
-    Route::any('departuredelete'  , 'API\ItineraryController@itineraryDepartureDelete');
-    Route::any('itinerarydelete'  , 'API\ItineraryController@itineraryDelete');
+    Route::any('itineraryimagedelete'   , 'API\ItineraryController@deleteImage');
+    Route::any('itinerarydeparture'     , 'API\ItineraryController@itineraryDepartureUpdate');
+    Route::any('departuredelete'        , 'API\ItineraryController@itineraryDepartureDelete');
+    Route::any('itinerarydelete'        , 'API\ItineraryController@itineraryDelete');
+    Route::any('itinerarydayslist'      , 'API\ItineraryController@itineraryDaysList');
+    Route::any('additinerarydays'       , 'API\ItineraryController@addItineraryDays');
+    Route::any('deleteitineraryday'     , 'API\ItineraryController@deleteItineraryDays');
+    
+    
+    
 
 
 

@@ -19,6 +19,7 @@ use DB;
 use App\Itinerary;
 use App\ItineraryGallery;
 use App\ItineraryDeparture;
+use App\ItineraryDay;
 
 
 class ItineraryController extends MasterController
@@ -29,7 +30,7 @@ class ItineraryController extends MasterController
     public function addItinerary(Request $request){
         $responseArray = array();
         $validator = Validator::make($request->all(), [
-            'title' => 'required|unique:events|max:255',
+            'title' => 'required|unique:itineraries|max:255',
             'description'=> 'required',
         ]);
         if ($validator->fails()) {
@@ -42,7 +43,6 @@ class ItineraryController extends MasterController
                 }
             }
             $responseArray['message']= "Input are not valid, ".$errorStr;
-
             $responseArray['error']= $errors;
             die;
         }else{
@@ -80,6 +80,61 @@ class ItineraryController extends MasterController
     }
 
 
+    
+    public function addItineraryDays(Request $request){
+        $responseArray = array();
+        $validator = Validator::make($request->all(), [
+            'day' => 'required|unique:itinerary_days,itinerary_id|max:255',
+            'details'=> 'required',
+            'place_name'=>'required'
+        ]);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $responseArray['status'] = false;
+            $errorStr ='';
+            if(!empty($errors)){
+                foreach($errors->all() as $value){
+                    $errorStr.=$value;
+                }
+            }
+            $responseArray['message']= "Input are not valid, ".$errorStr;
+            $responseArray['error']= $errors;
+        }else{
+            $data = $request->all();
+            if(array_key_exists('id',$data)){
+            	$id = $data['id'];
+            	$event = ItineraryDay::find($id);
+            	$event->itinerary_id = trim($data['itinerary_id']);
+	            $event->day = trim($data['day']);
+                $event->place_name = $data['place_name'];
+                $event->details =   $data['details'];
+	            $event->status = $data['status'];
+
+            }else{
+	            $event = new ItineraryDay();
+	            $event->itinerary_id = trim($data['itinerary_id']);
+	            $event->day          = trim($data['day']);
+                $event->place_name   = $data['place_name'];
+                $event->details     =   $data['details'];
+	            $event->status = $data['status'];
+	            $event->created_at = self::getCreatedDate();
+	        }
+            if($event->save()){
+                $responseArray['status'] = true;
+                $responseArray['code']= "200";
+                $responseArray['message']= "Itinerary Days added Successfully!!";
+                $responseArray['latest_id']= $event->id;
+            }else{
+                $responseArray['status'] = false;
+                $responseArray['code']= "500";
+                $responseArray['message']= "Opps! Somthing went wrong";
+            }
+        	
+        }
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+
+    }
+
 
 
      public function allItinerary(Request $request){
@@ -91,6 +146,21 @@ class ItineraryController extends MasterController
         $responseArray['event'] = $eventList;
         return response()->json(['data' => $responseArray], $this->successStatus); 
     }
+
+
+    public function itineraryDaysList(Request $request){
+        $responseArray = array();
+        $id = $request->get('id');
+        $eventList = ItineraryDay::with('Itinerary')->where('itinerary_id','=',$id)->paginate(10000);
+        $links = $eventList->links();
+        $responseArray['status'] = 'success';
+        $responseArray['code'] = '200';
+        $responseArray['event'] = $eventList;
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+    }
+
+
+    
 
 
 
@@ -320,6 +390,32 @@ class ItineraryController extends MasterController
         return response()->json([$responseArray]);
     }
 
+
+
+    public function deleteItineraryDays(Request $request){
+        $id = $request->get('id');
+        $eventtiming = $eventDetails = ItineraryDay::find($id);
+        if(!empty($eventtiming)){
+            //$eventtiming->delete()
+            if($eventtiming->delete()){
+                $responseArray['status'] = 'success';
+                $responseArray['code']= 200;
+                $responseArray['message']= "Itinerary Day Deleted."; 
+            }else{
+                $responseArray['status'] = 'errro';
+                $responseArray['code']= 500;
+                $responseArray['message']= "somthing went wrong, plz try after sometime"; 
+            }
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code']= 500;
+            $responseArray['message']= "Invalid request, No Event Timing found.";
+        }
+        return response()->json([$responseArray]);
+    }
+
+
+    
 
 
     
