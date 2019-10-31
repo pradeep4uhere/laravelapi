@@ -20,13 +20,84 @@ use App\Itinerary;
 use App\ItineraryGallery;
 use App\ItineraryDeparture;
 use App\ItineraryDay;
-
+use App\ItineraryDayGallery;
 
 class ItineraryController extends MasterController
 {
     public $successStatus = 200;
 
-   
+    //Upload Day image of the Itinerary
+    public function dayImageUpload(Request $request){
+        
+        $id= $request->get('id');
+        $responseArray = array();
+        if($request->get('imageStr')){
+         foreach($request->get('imageStr') as $file){
+                 list($type, $data) = explode(';', $file);
+                 list(, $data)      = explode(',', $file);
+                 $datas = base64_decode($data);
+                 $typeArr = explode('/', $type);
+                 $file = md5(uniqid()) . '.'.end($typeArr);
+                 Storage::disk('itineraryday')->put($file, base64_decode($data));
+                 if($this->saveItineraryDayGalleryImage($id,$file)){
+                     $imageArr[]=array('status'=>true,'image'=>$file);
+                 }
+         }
+         if(count($imageArr)>0){
+                 $responseArray['status'] = true;
+                 $responseArray['code']= "200";
+                 $responseArray['message']= "Image updated Successfully!!";
+                 $responseArray['images']= $imageArr;
+             }else{
+                 $responseArray['status'] = false;
+                 $responseArray['code']= "500";
+                 $responseArray['message']= "Opps! Somthing went wrong";
+                 return response()->json(['data' => $responseArray], $this->successStatus); 
+             }
+             
+         }
+ 
+         //Get Image List of this Event
+         $itineraryDay = ItineraryDay::find($id);
+         $imageList = ItineraryDayGallery::where('itinerary_day_id','=',$id)->orderBy('id','DESC')->get();
+         $imgGalleryList = array();
+         foreach($imageList as $item){
+             $imgGalleryList[] = array(
+                 "src"=>env('APP_URL').'/storage/app/public/itineraryday/'.$item['image'],
+                 "thumbnail"=>env('APP_URL').'/storage/app/public/itineraryday/'.$item['image'],
+                 "thumbnailWidth"=>rand(250,375),
+                 "thumbnailHeight"=>rand(175,250),
+                 "caption"=>"",
+                 "id"=>$item['id'],
+                 "is_default"=>$item['is_default'],
+                 "status"=>$item['status'],
+             );
+         }
+        $responseArray['status'] = true;
+        $responseArray['code']= "200";
+        $responseArray['imagesList'] = $imgGalleryList;
+        $responseArray['itineraryDay'] = $itineraryDay;
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+     }
+ 
+
+
+    private function saveItineraryDayGalleryImage($id,$imageName){
+        $eventGallery = new ItineraryDayGallery();
+        $eventGallery['itinerary_day_id'] = $id;
+        $eventGallery['image'] = $imageName;
+        $eventGallery['image_thumb'] = $imageName;
+        $eventGallery['media_type'] = 'image';
+        $eventGallery['status'] = '1';
+        $eventGallery['created_at'] = self::getCreatedDate();
+        if($eventGallery->save()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
     public function addItinerary(Request $request){
         $responseArray = array();
         $validator = Validator::make($request->all(), [
@@ -668,6 +739,51 @@ class ItineraryController extends MasterController
          return response()->json(['data' => $responseArray], $this->successStatus); 
     
     }
+
+
+   public function deletedayImage(Request $request){
+    $id = $request->get('id');
+    $eventImage = ItineraryDayGallery::find($id);
+    if($eventImage->delete()){
+        $responseArray['status'] = true;
+        $responseArray['code']= "200";
+        $responseArray['message']= "Image deleted Successfully!!";
+    }else{
+        $responseArray['status'] = false;
+        $responseArray['code']= "500";
+        $responseArray['message']= "Image not deleted !!";
+    }
+    return response()->json(['data' => $responseArray], $this->successStatus); 
+}
+
+
+    
+
+
+    public function defaultdayImage(Request $request){
+    
+        $id = $request->get('id');
+        $eventImage = ItineraryDayGallery::find($id);
+        DB::table('itinerary_day_galleries')->where(['itinerary_day_id'=>$eventImage->itinerary_day_id])->update(['is_default' =>0]);
+        if($eventImage->is_default==0){
+           $eventImage->is_default = 1;
+        }else{
+           $eventImage->is_default = 0;
+        }
+        if($eventImage->save()){
+            $responseArray['status'] = true;
+            $responseArray['code']= "200";
+            $responseArray['message']= "Image set as default Successfully!!";
+        }else{
+            $responseArray['status'] = false;
+            $responseArray['code']= "500";
+            $responseArray['message']= "Image not set as default !!";
+        }
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+   
+   }
+
+    
 
 
 

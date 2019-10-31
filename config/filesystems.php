@@ -66,6 +66,12 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+    'itineraryday' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itineraryday'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
         'destination' => [
             'driver' => 'local',
             'root' => storage_path('app/public/destination'),
