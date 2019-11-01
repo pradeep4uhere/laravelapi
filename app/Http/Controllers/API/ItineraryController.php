@@ -100,10 +100,19 @@ class ItineraryController extends MasterController
 
     public function addItinerary(Request $request){
         $responseArray = array();
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|unique:itineraries|max:255',
-            'description'=> 'required',
-        ]);
+        $data = $request->all();
+        if($data['id']!=''){
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|unique:itineraries,id|max:255',
+                'description'=> 'required',
+            ]);
+        }else{
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|unique:itineraries|max:255',
+                'description'=> 'required',
+            ]);
+        }
+        
         if ($validator->fails()) {
             $errors = $validator->errors();
             $responseArray['status'] = false;
@@ -115,11 +124,12 @@ class ItineraryController extends MasterController
             }
             $responseArray['message']= "Input are not valid, ".$errorStr;
             $responseArray['error']= $errors;
+            return response()->json(['data' => $responseArray], $this->successStatus); 
             die;
         }else{
             $data = $request->all();
-            if(array_key_exists('id',$data)){
-            	$id = $data['id'];
+            if($data['id']!=''){
+                $id = $data['id'];
             	$event = Itinerary::find($id);
             	$event->title = trim($data['title']);
 	            $event->description = trim($data['description']);
@@ -210,7 +220,7 @@ class ItineraryController extends MasterController
 
      public function allItinerary(Request $request){
         $responseArray = array();
-        $eventList = Itinerary::paginate(10000);
+        $eventList = Itinerary::with('ItineraryGallery')->paginate(10000);
         $links = $eventList->links();
         $responseArray['status'] = 'success';
         $responseArray['code'] = '200';
@@ -222,7 +232,7 @@ class ItineraryController extends MasterController
     public function itineraryDaysList(Request $request){
         $responseArray = array();
         $id = $request->get('id');
-        $eventList = ItineraryDay::with('Itinerary')->where('itinerary_id','=',$id)->paginate(10000);
+        $eventList = ItineraryDay::with('Itinerary','ItineraryDayGallery')->where('itinerary_id','=',$id)->paginate(10000);
         $links = $eventList->links();
         $responseArray['status'] = 'success';
         $responseArray['code'] = '200';

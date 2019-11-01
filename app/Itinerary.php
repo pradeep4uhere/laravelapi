@@ -15,4 +15,10 @@ class Itinerary extends Model
         return $this->hasMany(ItineraryDay::class);
     }
 
+    public function ItineraryGallery() {
+        return $this->hasMany(ItineraryGallery::class);
+    }
+
+
+
 }
