@@ -9,6 +9,7 @@ class ItineraryDeparture extends Model
     public function ItineraryDeparture() {
         return $this->belongsTo(Itinerary::class);
     }
+    
 
 
    

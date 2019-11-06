@@ -25,6 +25,8 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['cors']],function () {
     Route::any('getsetting'         , 'API\ApiController@getSettingList')->name('getsetting');
     Route::any('settingupdate'      , 'API\ApiController@settingUpdate')->name('settingupdate');
     Route::any('addtocart'          , 'API\CartController@addToCart')->name('addtocart');
+    Route::any('addtoexpcart'       , 'API\CartController@addtoExpCart')->name('addtoexpcart');
+    
 
 
     
@@ -157,11 +159,17 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('getcartlist'          , 'API\CartController@getCartList')->name('getcartlist');
     Route::any('deleteitemfrom'       , 'API\CartController@removeItemFromCartList')->name('deleteitemfrom');
     Route::any('updateitemcart'       , 'API\CartController@updateItemFromCartList')->name('updateitemcart');
+    Route::any('updateexpitemcart'    , 'API\CartController@updateExpItemFromCartList')->name('updateexpitemcart');
     Route::any('checkoffer'           , 'API\CartController@checkOfferCode')->name('checkoffer');
     Route::any('prepaymentbooking'    , 'API\OrderController@prePaymentBooking')->name('prepaymentbooking');
+    Route::any('expressbooking'       , 'API\OrderController@prePaymentExpBooking')->name('expressbooking');
     Route::any('getdestinationlist'   , 'API\FrontController@getDestinationList')->name('getdestinationlist');
     Route::any('getbannerlist'        , 'API\FrontController@getBannerList')->name('getbannerlist');
     Route::any('getalleventlist'      , 'API\FrontController@getAllEventList')->name('getalleventlist');
+    Route::any('getdestinationexplist', 'API\FrontController@getDestinationExpList')->name('getdestinationexplist');
+    Route::any('addtoexpcart'         , 'API\CartController@addtoExpCart')->name('addtoexpcart');
+    Route::any('getexpcartlist'       , 'API\CartController@getExpCartList')->name('getexpcartlist');
+    
 });
 
 

@@ -12,11 +12,15 @@ class Itinerary extends Model
     }
 
     public function ItineraryDay() {
-        return $this->hasMany(ItineraryDay::class);
+        return $this->hasMany(ItineraryDay::class)->with('ItineraryDayGallery');
     }
 
     public function ItineraryGallery() {
         return $this->hasMany(ItineraryGallery::class);
+    }
+
+    public function ValidItineraryDeparture() {
+        return $this->hasMany(ItineraryDeparture::class)->where('status','=', 1)->where('start_date', '>', \DB::raw('NOW()'))->orderBy('price','ASC');
     }
 
 

@@ -18,6 +18,11 @@ use App\Setting;
 use App\EventTiming;
 use App\Destination;
 use App\BannerGallery;
+use App\Itinerary;
+use App\ItineraryDay;
+use App\ItineraryDayGallery;
+use App\ItineraryGallery;
+
 
 class FrontController extends MasterController
 {
@@ -211,6 +216,75 @@ class FrontController extends MasterController
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
             $responseArray['data'] =$settingArr;
+            
+        }catch (Exception $e) {
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = $e->getMessage();
+        }
+        return response()->json($responseArray);
+
+    }
+
+
+
+    /*
+    *Get All the Destination Exp List
+    */
+    public function getDestinationExpList(Request $request){
+        try{
+            $all = $request->all();
+            if(array_key_exists('id', $all) && !empty($request->get('id'))){
+                $id = $request->get('id'); 
+                $settingArr = Itinerary::with('ValidItineraryDeparture','ItineraryDay','ItineraryGallery')->where('status','=',1)->where('id','=',$id)->get()->toArray();
+                //print_r($settingArr[0]['destination_gallery']);die;
+                if(!empty($settingArr[0]['itinerary_gallery'])){
+                        foreach($settingArr[0]['itinerary_gallery'] as $k=>$v){
+                             $url = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
+                             $settingArr[0]['itinerary_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url);
+                        }  
+                         
+                }else{
+                    $settingArr['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';
+                }
+
+                foreach($settingArr[0]['itinerary_day'] as $kkk=>$daysItem){
+                    if(!empty($daysItem['itinerary_day_gallery'])){
+                        foreach($daysItem['itinerary_day_gallery'] as $kk=>$vv){
+                            $daysImageurl = env('APP_URL').'/storage/app/public/itineraryday/'.$vv['image'];
+                            $settingArr[0]['itinerary_day'][$kkk]['itinerary_day_gallery'][$kk]=array(
+                                'original'=>$daysImageurl,
+                                'thumbnail'=>$daysImageurl,
+                            );
+                        }    
+                    }else{
+                        $settingArr['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';
+                    }
+                    
+                }
+                $itinerary =$settingArr; 
+
+            }else{
+                $itinerary = [];
+                $settingArr = Itinerary::with('ItineraryDay','ItineraryGallery')->where('status','=',1)->get()->toArray();
+                //echo "<pre>";
+                //print_r($settingArr);die;
+                //set All the Image Path 
+                foreach($settingArr as $key=>$value){
+                    if(!empty($value['itinerary_gallery'])){
+                        foreach($value['itinerary_gallery'] as $k=>$v){
+                            $url = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
+                             $settingArr[$key]['itinerary_gallery'][$k]=$url;
+                        }  
+                        $itinerary[] =$settingArr[$key];
+
+                    }       
+                }
+            }
+            
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['data'] =$itinerary;
             
         }catch (Exception $e) {
             $responseArray['status'] = false;
