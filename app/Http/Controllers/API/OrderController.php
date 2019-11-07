@@ -75,7 +75,7 @@ class OrderController extends MasterController
 	  if($other['other']['offerValue']!=''){
 		  $orderData['is_offer_applied']	= '1';
 	  }
-	  $orderData['offer_id']			= decrypt($other['other']['oid']);
+	  $orderData['offer_id']		= decrypt($other['other']['oid']);
 	  $orderData['offer_type']		= "";
 	  $orderData['offer_code']		= "";
 	  $orderData['offer_value']		= $other['other']['offerValue'];
@@ -320,9 +320,44 @@ class OrderController extends MasterController
     	}else{
     		return NULL;
     	}
-    }
+	}
+	
 
 
+	public function getLastOrderList(Request $request){
+		$setting = Setting::all();
+		$orderIdStr = $request->get('oid');
+		$orderStrNew = str_replace("oid=",'',$orderIdStr);
+		$responseArray = array();
+		if($orderStrNew!=''){
+			$orderId = decrypt($orderStrNew);
+			if(is_numeric($orderId)){
+				$orderDetails = Order::find($orderId)->toArray();
+				if(!empty($orderDetails)){
+					$orderDetailsArr = Order::with('ItineraryBooking')->find($orderId)->toArray();
+					$responseArray['status']  	= true;
+		        	$responseArray['code'] 	  	= 200;
+	            	$responseArray['message'] 	= "Order Recived";
+					$responseArray['order'] 	= $orderDetailsArr;
+					$responseArray['setting'] 	= $setting;
+					
 
-
+				}else{
+					$responseArray['status'] = false;
+					$responseArray['code'] = 500;
+					$responseArray['message'] ="Invalid Request.";
+				}
+			}else{
+        		$responseArray['status'] = false;
+		        $responseArray['code'] = 500;
+	            $responseArray['message'] ="Invalid Request.";
+        	}
+		}else{
+			$responseArray['status'] = false;
+			$responseArray['code'] = 500;
+			$responseArray['message'] ="Invalid Request.";
+		}
+		return response()->json($responseArray);
+	}
+	
 }

@@ -169,6 +169,8 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('getdestinationexplist', 'API\FrontController@getDestinationExpList')->name('getdestinationexplist');
     Route::any('addtoexpcart'         , 'API\CartController@addtoExpCart')->name('addtoexpcart');
     Route::any('getexpcartlist'       , 'API\CartController@getExpCartList')->name('getexpcartlist');
+    Route::any('lastorderlist'        , 'API\OrderController@getLastOrderList')->name('lastorderlist');
+    
     
 });
 

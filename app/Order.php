@@ -63,6 +63,10 @@ class Order extends Model
     public function TempSeatBooking() {
         return $this->hasMany(TempSeatBooking::class)->with('EventTiming','EventSeat');
     }
+    
+    public function ItineraryBooking() {
+        return $this->hasMany(ItineraryBooking::class)->with('Itinerary','ItineraryDeparture');
+    }
 
     
 
