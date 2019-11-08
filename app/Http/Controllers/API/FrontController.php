@@ -22,6 +22,7 @@ use App\Itinerary;
 use App\ItineraryDay;
 use App\ItineraryDayGallery;
 use App\ItineraryGallery;
+use App\City;
 
 
 class FrontController extends MasterController
@@ -97,6 +98,23 @@ class FrontController extends MasterController
     }
 
 
+    public function getCityName(Request $request){
+        try{
+            $id= $request->get('id');
+            $cityArr = City::find($id);
+
+            //Get all Review List
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['data'] = $cityArr;
+            
+        }catch (Exception $e) {
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = $e->getMessage();
+        }
+        return response()->json($responseArray);
+    }
 
 
     public function getSettingList(Request $request){
@@ -190,6 +208,14 @@ class FrontController extends MasterController
     public function getDestinationList(Request $request){
         try{
             $all = $request->all();
+            $type = $request->get('type');
+            if($type=='short'){
+                $typeSort = 'ASC';
+            }else if($type=='long'){
+                $typeSort = 'DESC';
+            }else{
+                $typeSort = 'ASC';
+            }
             if(array_key_exists('id', $all) && !empty($request->get('id'))){
                 $id = $request->get('id'); 
                 $settingArr = Destination::with('DestinationGallery')->where('status','=',1)->where('id','=',$id)->get()->toArray();
@@ -199,23 +225,28 @@ class FrontController extends MasterController
                              $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
                              $settingArr[0]['destination_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url);
                         }     
-                    }
+                    }else{
+                        $settingArr[0]['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';
+                    } 
             }else{
-                $settingArr = Destination::with('DestinationGallery')->where('status','=',1)->get()->toArray();
+                $settingArr = Destination::with('DestinationGallery')->where('status','=',1)->orderBy('trip_type',$typeSort)->get()->toArray();
                 //set All the Image Path 
                 foreach($settingArr as $key=>$value){
                     if(!empty($value['destination_gallery'])){
                         foreach($value['destination_gallery'] as $k=>$v){
-                            $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                             $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
                              $settingArr[$key]['destination_gallery'][$k]=$url;
-                        }     
-                    }       
+                        }    
+                    }else{
+                        $settingArr[$key]['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';
+                    }        
                 }
             }
-            
+            $globalArr = Setting::all();
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
             $responseArray['data'] =$settingArr;
+            $responseArray['setting'] =$globalArr;
             
         }catch (Exception $e) {
             $responseArray['status'] = false;
@@ -234,6 +265,11 @@ class FrontController extends MasterController
     public function getDestinationExpList(Request $request){
         try{
             $all = $request->all();
+            $type = $request->get('type');
+            $typeSort = 'ASC';
+            if($type=='long'){$typeSort = 'DESC';}
+            
+            
             if(array_key_exists('id', $all) && !empty($request->get('id'))){
                 $id = $request->get('id'); 
                 $settingArr = Itinerary::with('ValidItineraryDeparture','ItineraryDay','ItineraryGallery')->where('status','=',1)->where('id','=',$id)->get()->toArray();
@@ -266,7 +302,7 @@ class FrontController extends MasterController
 
             }else{
                 $itinerary = [];
-                $settingArr = Itinerary::with('ItineraryDay','ItineraryGallery')->where('status','=',1)->get()->toArray();
+                $settingArr = Itinerary::with('ItineraryDay','ItineraryGallery')->where('status','=',1)->orderBy('trip_type',$typeSort)->get()->toArray();
                 //echo "<pre>";
                 //print_r($settingArr);die;
                 //set All the Image Path 
@@ -281,10 +317,11 @@ class FrontController extends MasterController
                     }       
                 }
             }
-            
+            $globalArr = Setting::all();
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
             $responseArray['data'] =$itinerary;
+            $responseArray['setting'] =$globalArr;
             
         }catch (Exception $e) {
             $responseArray['status'] = false;
@@ -408,6 +445,8 @@ class FrontController extends MasterController
             $responseArray['eventFinalArr'] =$eventFinalArr;
             unset($event['data']);
             $responseArray['eventPaginationData'] =$event;
+            $responseArray['setting'] =$globalArr;
+            
             
             
         }catch (Exception $e) {
