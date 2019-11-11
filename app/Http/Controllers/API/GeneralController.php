@@ -19,6 +19,7 @@ use App\Event;
 use Storage;
 use App\BannerGallery;
 use App\Setting;
+use App\Itinerary;
 
 class GeneralController extends MasterController
 {
@@ -48,6 +49,28 @@ class GeneralController extends MasterController
         $setting = Setting::all();
         return $setting;
     }
+
+
+    
+    /*
+     *@Get All Dashboard Data
+     */
+    public function getAllTravellOrderList(Request $request){
+        $setting = $this->getSetting();
+        $priceType = $setting['14']['options_value'];
+
+        $responseArray = array();
+        if($request->isMethod('post')){
+            $order = Order::with('ItineraryBooking','OrderStatus')->where('order_type','=',2)->get()->toArray();
+            $responseArray['order']=array("orderList"=>$order,'Count'=>count($order));
+            $responseArray['status'] = 'success';
+            $responseArray['code'] = '200';
+            
+        }
+        return response()->json($responseArray, $this->successStatus); 
+    }
+
+
 
     /*
      *@Get All Dashboard Data

@@ -36,6 +36,8 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['cors']],function () {
 Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function () {
 
     Route::any('getalldashboard'    , 'API\GeneralController@getAllDashobardList');
+    Route::any('getalltravellorderlist'    , 'API\GeneralController@getAllTravellOrderList');
+    
 
 	Route::any('testauth'           , 'API\GeneralController@testAPI');
     Route::get('details'            , 'API\UserController@details');
@@ -43,6 +45,8 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('updateuser'         , 'API\UserController@userupdate');
     Route::any('usereventorderlist' , 'API\UserController@userEventOrderList');
     Route::any('usereventorderdetails' , 'API\UserController@userEventOrderDetails');
+    Route::any('usertravelorderdetails' , 'API\UserController@userTravelOrderDetails');
+    
 
 
     

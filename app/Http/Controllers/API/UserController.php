@@ -336,6 +336,61 @@ class UserController extends MasterController
 
     
 
+    
+    private function getDefaultImage($gallery){
+        $imgStr = '';
+        if(!empty($gallery)){
+            $imgStr = '';
+            foreach($gallery as $item){
+                if($item['is_default']==1){
+                    $imgStr = $item['image'];
+                }
+            }
+            if($imgStr==''){
+                $imgStr = $gallery[0]['image'];
+            }
+        }
+        return env('APP_URL').'/storage/app/public/itinerary/'.$imgStr;
+    }
+
+
+    public function userTravelOrderDetails(Request $request){
+        $setting = $this->getSetting();
+        $orderId = $request->get('order_id');
+        $orderDetails = Order::with('OrderStatus','TempSeatBooking','ItineraryBooking')->where('orderId','=',$orderId)->first()->toArray();
+        //print_r($orderDetails);die;
+        $eventTiming = array();
+        //Formate all the Quantity for the Order  
+        $seatCount  = array();
+        $keyArray = array();
+        $finalArray = array();
+        foreach($orderDetails['itinerary_booking'] as $k=>$item){
+            if(!empty($item['itinerary'])){
+                $orderDetails['itinerary_booking'][$k]['itinerary']['image']=$this->getDefaultImage($item['itinerary']['itinerary_gallery']);
+            }
+            unset($orderDetails['itinerary_booking'][$k]['itinerary']['itinerary_gallery']);
+        }
+    
+        //Get User Details
+       
+        $user = User::find($orderDetails['user_id']);
+        if(!empty($orderDetails)){
+            $responseArray['status'] = 'success';
+            $responseArray['code'] = '200';
+            $responseArray['orderDetails'] = array($orderDetails);
+            $responseArray['User'] = $user;
+            $responseArray['settings'] = $setting;
+
+
+            
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code'] = '500';
+            $responseArray['message'] = "User not found!!.";
+        }
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+    }
+
     public function userEventOrderDetails(Request $request){
         $setting = $this->getSetting();
         $orderId = $request->get('order_id');

@@ -21,7 +21,7 @@ class ItineraryBooking extends Model
     ];
 
     public function Itinerary() {
-        return $this->belongsTo(Itinerary::class);
+        return $this->belongsTo(Itinerary::class)->with('ItineraryGallery');
     }
 
 
