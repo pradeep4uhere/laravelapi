@@ -25,11 +25,45 @@ class EventController extends MasterController
 
     public function getEventList(Request $request){
         $responseArray = array();
-        $eventList = Event::paginate(10);
+        $eventList = Event::paginate(10000);
         $links = $eventList->links();
+
+        /****************Datatable Start***************/
+            $columns = array(
+                array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                array('label'=>'Name','field'=>'title','sort'=>'asc','width'=>'170'),
+                array('label'=>'Durration','field'=>'durration','sort'=>'asc','width'=>'100'),
+              //  array('label'=>'Description','field'=>'description','sort'=>'asc','width'=>'100'),
+                array('label'=>'is_feature','field'=>'is_feature','sort'=>'asc','width'=>'100'),
+                array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),
+                array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
+                array('label'=>'Action','field'=>'action','sort'=>'asc','width'=>'100')
+                );
+            $row = [];
+            $actionStr ='';
+            foreach($eventList as $item){
+                $row[] =array(
+                    'id'=>$item['id'],
+                    'title'=>($item['title']!='')?$item['title']:"--",
+                   // 'description'=>($item['description']!='')?substr(strip_tags($item['description']),0,20):"--",
+                    'durration'=>($item['durration']!='')?$item['durration']:"--",
+                    'is_feature'=>($item['is_feature']!='')?$item['is_feature']:"0",
+                    'status'=>($item['status']!='')?$item['status']:"0",
+                    'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
+                    'action'=>$actionStr
+                );
+            }
+            $dataTable = array();
+            $dataTable['columns'] =$columns;
+            $dataTable['rows'] =$row;
+        /****************Datatable Ends now***************/
+
+        
         $responseArray['status'] = 'success';
         $responseArray['code'] = '200';
         $responseArray['event'] = $eventList;
+        $responseArray['dataTable'] = $dataTable;
+        
         return response()->json(['data' => $responseArray], $this->successStatus); 
     }
 

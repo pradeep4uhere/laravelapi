@@ -17,6 +17,7 @@ use App\EventGallery;
 use App\SittingType;
 use App\Theatre;
 use App\Price;
+use Carbon\Carbon;
 class UserController extends MasterController
 {
      
@@ -180,9 +181,49 @@ class UserController extends MasterController
         $responseArray = array();
         $userList = User::with('Order')->paginate(10000);
         $links = $userList->links();
+       
+
+        /****************Datatable Start***************/
+        $columns = array(
+            array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+            array('label'=>'Name','field'=>'first_name','sort'=>'asc','width'=>'170'),
+            array('label'=>'Username','field'=>'username','sort'=>'asc','width'=>'100'),
+            array('label'=>'Email','field'=>'email','sort'=>'asc','width'=>'100'),
+            array('label'=>'Phone','field'=>'phone','sort'=>'asc','width'=>'100'),
+            array('label'=>'Address','field'=>'street_address','sort'=>'asc','width'=>'100'),
+            array('label'=>'City','field'=>'city','sort'=>'asc','width'=>'100'),
+            array('label'=>'Pincode','field'=>'postcode','sort'=>'asc','width'=>'100'),
+            array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),
+            array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
+            array('label'=>'Action','field'=>'action','sort'=>'asc','width'=>'100')
+            );
+        $row = [];
+        $actionStr ='';
+        foreach($userList as $item){
+            $date = new Carbon($item['created_at']->toDateTimeString());
+            $row[] =array(
+                'id'=>$item['id'],
+                'first_name'=>($item['first_name']!='')?$item['first_name']:"--",
+                'username'=>($item['username']!='')?$item['username']:"--",
+                'email'=>($item['email']!='')?$item['email']:"--",
+                'phone'=>($item['phone']!='')?$item['phone']:"--",
+                'street_address'=>($item['street_address']!='')?$item['street_address']:"--",
+                'city'=>($item['city']!='')?$item['city']:"--",
+                'postcode'=>($item['postcode']!='')?$item['postcode']:"--",
+                'status'=>$item['status'],
+                'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
+                'action'=>$actionStr
+            );
+        }
+        $dataTable = array();
+        $dataTable['columns'] =$columns;
+        $dataTable['rows'] =$row;
+        /****************Datatable Ends now***************/
+
         $responseArray['status'] = 'success';
         $responseArray['code'] = '200';
         $responseArray['user'] = $userList;
+        $responseArray['dataTable'] = $dataTable;
         return response()->json(['data' => $responseArray], $this->successStatus); 
     }
 

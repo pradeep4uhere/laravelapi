@@ -17,11 +17,48 @@ class TheatreController extends MasterController
 
     public function getTheatreList(Request $request){
         $responseArray = array();
-        $ListArr = Theatre::paginate(100);
+        $ListArr = Theatre::with('City')->paginate(10000);
         $links = $ListArr->links();
+
+        /****************Datatable Start***************/
+            $columns = array(
+                array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                array('label'=>'Name','field'=>'theater_name','sort'=>'asc','width'=>'170'),
+                array('label'=>'Address','field'=>'address','sort'=>'asc','width'=>'100'),
+                array('label'=>'City','field'=>'city','sort'=>'asc','width'=>'100'),
+                array('label'=>'Company Name','field'=>'company_name','sort'=>'asc','width'=>'100'),
+                array('label'=>'Contact Number','field'=>'contact_number','sort'=>'asc','width'=>'100'),
+                array('label'=>'Email Address','field'=>'email_address','sort'=>'asc','width'=>'100'),
+                array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),
+                array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
+                array('label'=>'Action','field'=>'action','sort'=>'asc','width'=>'100')
+                );
+            $row = [];
+            $actionStr ='';
+            foreach($ListArr as $item){
+                $row[] =array(
+                    'id'=>$item['id'],
+                    'theater_name'=>($item['theater_name']!='')?$item['theater_name']:"--",
+                    'address'=>($item['address']!='')?$item['address']:"--",
+                    'city'=>(!empty($item['city']))?$item['city']['city_name']:"--",
+                    'company_name'=>($item['company_name']!='')?$item['company_name']:"--",
+                    'contact_number'=>($item['contact_number']!='')?$item['contact_number']:"--",
+                    'email_address'=>($item['email_address']!='')?$item['email_address']:"--",
+                    'status'=>($item['status']!='')?$item['status']:"0",
+                    'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
+                    'action'=>$actionStr
+                );
+            }
+            $dataTable = array();
+            $dataTable['columns'] =$columns;
+            $dataTable['rows'] =$row;
+        /****************Datatable Ends now***************/
+
+
         $responseArray['status'] = 'success';
         $responseArray['code'] = '200';
         $responseArray['theatre'] = $ListArr;
+        $responseArray['dataTable']= $dataTable;
         return response()->json($responseArray, $this->successStatus); 
     }
 

@@ -46,9 +46,46 @@ class DestinationController extends MasterController
         {
             $destination = Destination::all();
             if($destination->count()){
+                 /****************Datatable Start***************/
+                    $columns = array(
+                        array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                        array('label'=>'Name','field'=>'title','sort'=>'asc','width'=>'170'),
+                        array('label'=>'Description','field'=>'descriptions','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Altitude','field'=>'altitude','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Climate','field'=>'climate','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Population','field'=>'population','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Shopping','field'=>'shopping','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Cuisine','field'=>'cuisine','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Action','field'=>'action','sort'=>'asc','width'=>'100')
+                        );
+                    $row = [];
+                    $actionStr ='';
+                    foreach($destination as $item){
+                        $row[] =array(
+                            'id'=>$item['id'],
+                            'title'=>($item['title']!='')?$item['title']:"--",
+                            'descriptions'=>($item['descriptions']!='')?substr(strip_tags($item['descriptions']),0,20):"--",
+                            'altitude'=>($item['altitude']!='')?$item['altitude']:"--",
+                            'climate'=>($item['climate']!='')?$item['climate']:"--",
+                            'population'=>($item['population']!='')?substr(strip_tags($item['population']),0,20):"--",
+                            'shopping'=>($item['shopping']!='')?substr(strip_tags($item['shopping']),0,20):"--",
+                            'cuisine'=>($item['cuisine']!='')?substr(strip_tags($item['cuisine']),0,20):"--",
+                            'status'=>($item['status']!='')?$item['status']:"0",
+                            'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
+                            'action'=>$actionStr
+                        );
+                    }
+                    $dataTable = array();
+                    $dataTable['columns'] =$columns;
+                    $dataTable['rows'] =$row;
+                /****************Datatable Ends now***************/
+                    
                 $responseArray['status'] = 'success';
                 $responseArray['code'] = '200';
                 $responseArray['data'] = $destination;
+                $responseArray['dataTable'] = $dataTable;
             }else{
                 $responseArray['status'] = 'error';
                 $responseArray['code'] = '500';

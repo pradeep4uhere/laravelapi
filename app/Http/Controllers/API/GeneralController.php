@@ -63,6 +63,42 @@ class GeneralController extends MasterController
         if($request->isMethod('post')){
             $order = Order::with('ItineraryBooking','OrderStatus')->where('order_type','=',2)->get()->toArray();
             $responseArray['order']=array("orderList"=>$order,'Count'=>count($order));
+
+            /****************Datatable Start***************/
+                $columns = array(
+                    array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                    array('label'=>'orderID','field'=>'orderID','sort'=>'asc','width'=>'170'),
+                    array('label'=>'Order Date','field'=>'order_date','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Name','field'=>'shipping_fname','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Email','field'=>'shipping_email','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Contact Number','field'=>'shipping_mobile','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Total Amount','field'=>'total_amount','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Offer Applied','field'=>'is_offer_applied','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Order Status','field'=>'order_status','sort'=>'asc','width'=>'100'),
+                    array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
+                    );
+                $row = [];
+                $actionStr ='';
+                foreach($order as $item){
+                    $row[] =array(
+                        'id'=>$item['id'],
+                        'orderID'=>($item['orderID']!='')?$item['orderID']:"--",
+                        'order_date'=>date("d-M-Y",strtotime($item['order_date'])), 
+                        'shipping_fname'=>($item['shipping_fname']!='')?$item['shipping_fname'].' '.$item['shipping_lname']:"--",
+                        'shipping_email'=>($item['shipping_email']!='')?$item['shipping_email']:"--",
+                        'shipping_mobile'=>($item['shipping_mobile']!='')?$item['shipping_mobile']:"--",
+                        'total_amount'=>($item['total_amount']!='')?$priceType.$item['total_amount']:$priceType."0.00",
+                        'is_offer_applied'=>($item['is_offer_applied']!='')?$item['is_offer_applied']:"--",
+                        'order_status'=>(!empty($item['order_status']))?$item['order_status']['status_type']:"--",
+                        'created_at'=>date("d-M-Y",strtotime($item['created_at']))
+                    );
+                }
+                $dataTable = array();
+                $dataTable['columns'] =$columns;
+                $dataTable['rows'] =$row;
+                $responseArray['order']['dataTable']=$dataTable;
+            /****************Datatable Ends now***************/
+            
             $responseArray['status'] = 'success';
             $responseArray['code'] = '200';
             
@@ -81,8 +117,43 @@ class GeneralController extends MasterController
 
         $responseArray = array();
         if($request->isMethod('post')){
-            $order = Order::with('OrderStatus')->get()->toArray();
+            $order = Order::with('OrderStatus')->where("order_type",'=',1)->get()->toArray();
             $responseArray['order']=array("orderList"=>$order,'Count'=>count($order));
+
+            /****************Datatable Start***************/
+            $columns = array(
+                array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                array('label'=>'orderID','field'=>'orderID','sort'=>'asc','width'=>'170'),
+                array('label'=>'Order Date','field'=>'order_date','sort'=>'asc','width'=>'100'),
+                array('label'=>'Name','field'=>'shipping_fname','sort'=>'asc','width'=>'100'),
+                array('label'=>'Email','field'=>'shipping_email','sort'=>'asc','width'=>'100'),
+                array('label'=>'Contact Number','field'=>'shipping_mobile','sort'=>'asc','width'=>'100'),
+                array('label'=>'Total Amount','field'=>'total_amount','sort'=>'asc','width'=>'100'),
+                array('label'=>'Offer Applied','field'=>'is_offer_applied','sort'=>'asc','width'=>'100'),
+                array('label'=>'Order Status','field'=>'order_status','sort'=>'asc','width'=>'100'),
+                array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
+                );
+            $row = [];
+            $actionStr ='';
+            foreach($order as $item){
+                $row[] =array(
+                    'id'=>$item['id'],
+                    'orderID'=>($item['orderID']!='')?$item['orderID']:"--",
+                    'order_date'=>date("d-M-Y",strtotime($item['order_date'])), 
+                    'shipping_fname'=>($item['shipping_fname']!='')?$item['shipping_fname'].' '.$item['shipping_lname']:"--",
+                    'shipping_email'=>($item['shipping_email']!='')?$item['shipping_email']:"--",
+                    'shipping_mobile'=>($item['shipping_mobile']!='')?$item['shipping_mobile']:"--",
+                    'total_amount'=>($item['total_amount']!='')?$priceType.$item['total_amount']:$priceType."0.00",
+                    'is_offer_applied'=>($item['is_offer_applied']!='')?$item['is_offer_applied']:"--",
+                    'order_status'=>(!empty($item['order_status']))?$item['order_status']['status_type']:"--",
+                    'created_at'=>date("d-M-Y",strtotime($item['created_at']))
+                );
+            }
+            $dataTable = array();
+            $dataTable['columns'] =$columns;
+            $dataTable['rows'] =$row;
+            $responseArray['order']['dataTable']=$dataTable;
+        /****************Datatable Ends now***************/
 
             //Get Total Sum Of Booking Amount
             $total = DB::table("orders")
@@ -340,14 +411,34 @@ class GeneralController extends MasterController
             $pageList->title    = $title;
             $pageList->url      = $url;
             $pageList->status   = $status;
-            if($pageList->save()){
-                $responseArray['status'] = 'success';
-                $responseArray['code'] = '200';
-                $responseArray['message'] = "Viedos Infomration updated.";
+
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|unique:review_videos|max:255',
+                'url'=> 'required',
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $responseArray['status'] = false;
+                $errorStr ='';
+                if(!empty($errors)){
+                    foreach($errors->all() as $value){
+                        $errorStr.=$value;
+                    }
+                }
+                $responseArray['message']= "Input are not valid, ".$errorStr;
+    
+                $responseArray['error']= $errors;
             }else{
-                $responseArray['status'] = 'success';
-                $responseArray['code'] = '500';
-                $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+
+                if($pageList->save()){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['message'] = "Viedos Infomration updated.";
+                }else{
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
             }
             return response()->json($responseArray, $this->successStatus); 
         }

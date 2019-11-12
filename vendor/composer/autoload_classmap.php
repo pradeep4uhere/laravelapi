@@ -50,6 +50,7 @@ return array(
     'App\\Http\\Middleware\\TrustProxies' => $baseDir . '/app/Http/Middleware/TrustProxies.php',
     'App\\Http\\Middleware\\VerifyCsrfToken' => $baseDir . '/app/Http/Middleware/VerifyCsrfToken.php',
     'App\\Itinerary' => $baseDir . '/app/Itinerary.php',
+    'App\\ItineraryBooking' => $baseDir . '/app/ItineraryBooking.php',
     'App\\ItineraryDay' => $baseDir . '/app/ItineraryDay.php',
     'App\\ItineraryDayGallery' => $baseDir . '/app/ItineraryDayGallery.php',
     'App\\ItineraryDeparture' => $baseDir . '/app/ItineraryDeparture.php',
