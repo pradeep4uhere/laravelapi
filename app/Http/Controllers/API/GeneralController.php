@@ -118,6 +118,37 @@ class GeneralController extends MasterController
         $responseArray = array();
         if($request->isMethod('post')){
             $order = Order::with('OrderStatus')->where("order_type",'=',1)->get()->toArray();
+            $etravelOrderChart=array();
+            $etravelOrderAmount = [];
+            $esuccess = 0;
+            $efailed = 0;
+            $ehold = 0;
+            $enew = 0;
+            $ecancel=0;
+            $eppending=0;
+            foreach($order as $item){
+                if($item['order_status_id']==1){ 
+                    $esuccess++;
+                    $etravelOrderChart["paymentSccuess"]=$esuccess;
+                }else if($item['order_status_id']==5){ 
+                    $efailed++;
+                    $etravelOrderChart['failed']=$efailed;
+                }else if($item['order_status_id']==3){ 
+                    $ehold++;
+                    $etravelOrderChart["onHold"]=$ehold;
+                }else if($item['order_status_id']==4){ 
+                    $eppending++;
+                    $etravelOrderChart["paymentPending"]=$eppending;
+                }else if($item['order_status_id']==6){ 
+                    $ecancel++;
+                    $etravelOrderChart["cancel"]=$ecancel;
+                }else{
+                    $enew++;
+                    $etravelOrderChart["New"]=$enew;
+                }
+                $etravelOrderAmount[]=$item['total_amount'];
+            }
+
             $responseArray['order']=array("orderList"=>$order,'Count'=>count($order));
 
             /****************Datatable Start***************/
@@ -193,11 +224,46 @@ class GeneralController extends MasterController
                     'image'=>$this->getEventImage($value['event_gallery']),
                 );
             }
+            //[["Type","Value"], ["New", 5], ["Booked", 25], ["Payment Sccuess", 52], ["Cancel",  52]]
+            $travelOrderChart=array();
+            $travelOrderAmount = [];
+            $success = 0;
+            $failed = 0;
+            $hold = 0;
+            $new = 0;
+            $cancel=0;
+            $ppending=0;
+            $travelOrder = Order::with('OrderStatus')->where("order_type",'=',2)->get()->toArray();
+            foreach($travelOrder as $item){
+                if($item['order_status_id']==1){ 
+                    $success++;
+                    $travelOrderChart["paymentSccuess"]=$success;
+                }else if($item['order_status_id']==5){ 
+                    $failed++;
+                    $travelOrderChart['failed']=$failed;
+                }else if($item['order_status_id']==3){ 
+                    $hold++;
+                    $travelOrderChart["onHold"]=$hold;
+                }else if($item['order_status_id']==4){ 
+                    $ppending++;
+                    $travelOrderChart["paymentPending"]=$ppending;
+                }else if($item['order_status_id']==6){ 
+                    $cancel++;
+                    $travelOrderChart["cancel"]=$cancel;
+                }else{
+                    $new++;
+                    $travelOrderChart["New"]=$new;
+                }
+                $travelOrderAmount[]=$item['total_amount'];
+            }
 
-           
-            
             $responseArray['order']['Enquiry'] = 0;
             $responseArray['order']['Users'] = $users->count();
+            $responseArray['order']['TravelOrder'] = count($travelOrder);
+            $responseArray['order']['travelOrderChart'] = $travelOrderChart;
+            $responseArray['order']['etravelOrderChart'] = $etravelOrderChart;
+            
+            $responseArray['order']['TravelOrderAmount'] =number_format(array_sum($travelOrderAmount),2);
             $responseArray['order']['UsersList'] = $users;
             $responseArray['order']['TotalAmount'] = number_format($total[0]->total,2);
             $responseArray['order']['EventList'] = $eventFinalArr;
