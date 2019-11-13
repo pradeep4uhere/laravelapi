@@ -175,8 +175,10 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('getexpcartlist'       , 'API\CartController@getExpCartList')->name('getexpcartlist');
     Route::any('lastorderlist'        , 'API\OrderController@getLastOrderList')->name('lastorderlist');
     Route::any('getcityname'          , 'API\FrontController@getCityName')->name('getcityname');
-    
-    
+    Route::any('usereventorderlist'   , 'API\UserController@userEventOrderList')->name('usereventorderlist');
+    Route::any('userdetails'          , 'API\UserController@userDetails')->name('userdetails');
+    Route::any('updateuser'           , 'API\UserController@userUpdateProfile')->name('updateuser');
+    Route::any('usereventorderdetails', 'API\UserController@userEventOrderDetails');
     
 });
 

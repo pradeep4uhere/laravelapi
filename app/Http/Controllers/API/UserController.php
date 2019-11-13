@@ -135,12 +135,14 @@ class UserController extends MasterController
                                 $username =  Auth::user()->username;
                                 $first_name =  Auth::user()->first_name;
                                 $last_name =  Auth::user()->last_name;
+                                $created_at =  date("d M, Y",strtotime(Auth::user()->created_at->toDateTimeString()));
                                 $userDetails = array(
                                     'id'        =>  $userId,
                                     'email'     =>  $email,
                                     'username'  =>  $username,
                                     'first_name'=>  $first_name,
-                                    'last_name' =>  $last_name,                                
+                                    'last_name' =>  $last_name, 
+                                    'created_at' =>  $created_at,                                
                                 );
                                 $responseArray['status'] = 'success';
                                 $responseArray['code'] = '200';
@@ -514,4 +516,157 @@ class UserController extends MasterController
         }
         return response()->json(['data' => $responseArray], $this->successStatus); 
     }
+
+
+
+        public function userdetails(Request $request){
+            $setting = $this->getSetting();
+            if($request->isMethod('post'))
+            {
+                $data = $request->all();
+                $id= $data['id'];
+                $user = User::with('Order','City','Country')->find($id)->toArray();
+                if(!empty($user)){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['userData'] =$user;
+                    $responseArray['settings'] = $setting;
+                    
+                }else{
+                    $responseArray['status'] = 'error';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = 'Invalid Requets';
+    
+            }
+            return response()->json($responseArray, $this->successStatus); 
+        }
+
+
+
+
+
+
+
+
+    public function userUpdateProfile(Request $request){
+        $responseArray = array();
+
+        $responseArray['status'] = 'error';
+        $responseArray['code'] = '500';
+        if ($request->isMethod('post')) {
+           $data = $request->get('user');
+            if(array_key_exists('oldpwd',$data)){
+                $passowrd = $data['oldpwd'];
+                $userData = User::find($data['id']);
+                $email = $userData['email'];
+                $credentials = array('email'=>$email, 'password'=>$passowrd);
+                if (Auth::attempt($credentials)) {
+                    $user = User::find($data['id']);
+                    $user->password  = Hash::make($data['cpwd']);
+                    if($user->save()){
+                        $responseArray['status'] = 'success';
+                        $responseArray['code'] = '200';
+                        $responseArray['message'] = "!! Password Changed Successfully !!";
+                    }else{
+                            $responseArray['status'] = 'error';
+                            $responseArray['code'] = '500';
+                            $responseArray['message'] = "Opps!! Somthing went wrong, pelase try after sometime";
+                    }
+                }else{
+                    $responseArray['status'] = 'error';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = "Invlaid Old Password";
+                }
+            }else{
+                    $validator = Validator::make($request->get('user'), [
+                            'id' => 'required',
+                            'first_name' => 'required|max:50|min:3',
+                            'last_name' => 'required|max:50|min:3',
+                            'street_address' => 'required|max:150|min:3',
+                            'address_2' => 'required|max:150|min:3',
+                            'country_id' => 'required|max:150|min:1',
+                            'state_id' => 'required|max:150|min:1',
+                            'city_id' => 'required|max:150|min:1',
+                            'phone' => 'required|max:20|min:10',
+                        ]);
+                        if ($validator->fails()) {
+                            $errors = $validator->errors();
+                            $responseArray['status'] = false;
+                            $errorStr ='';
+                            if(!empty($errors)){
+                                foreach($errors->all() as $value){
+                                    $errorStr.=$value;
+                                }
+                            }
+                            $responseArray['message']= "Input are not valid, ".$errorStr;
+                            $responseArray['error']= $errors;
+                        }else{
+                            $user = User::find($data['id']);
+                            
+                            if(!empty($user)){
+                            $user->first_name      = $data['first_name'];
+                            $user->last_name       = $data['last_name'];
+                            $user->street_address  = $data['street_address'];
+                            $user->address_2       = $data['address_2'];
+                            $user->phone           = $data['phone'];
+                            $user->postcode        = $data['postcode'];
+                            if(is_numeric($data['country_id'])){
+                                    $user->country_id        = $data['country_id'];
+                            }
+                            if(is_numeric($data['state_id'])){
+                                $user->state_id        = $data['state_id'];
+                            }
+                            if(is_numeric($data['city_id'])){
+                                $user->city_id        = $data['city_id'];
+                            }
+                            if($user->save()){
+                                $responseArray['status'] = 'success';
+                                $responseArray['code'] = '200';
+                                $responseArray['message'] = "User update successfully.";
+                            }else{
+                                    $responseArray['status'] = 'error';
+                                    $responseArray['code'] = '500';
+                                    $responseArray['message'] = "Opps!! Somthing went wrong, pelase try after sometime";
+                            }
+                            }else{
+                                $responseArray['status'] = 'error';
+                                $responseArray['code'] = '500';
+                                $responseArray['message'] = "User not found!!.";
+                            }
+                
+                            
+                            }
+            }
+            
+        }
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

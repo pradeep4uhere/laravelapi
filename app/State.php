@@ -13,4 +13,8 @@ class State extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function User() {
+        return $this->hasMany(User::class);
+    }
+
 }

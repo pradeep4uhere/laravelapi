@@ -45,6 +45,19 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function State() {
+        return $this->belongsTo(State::class);
+    }
+
+    public function City() {
+        return $this->belongsTo(City::class);
+    }
+
+    public function Country() {
+        return $this->belongsTo(Country::class);
+    }
+
+
 
 
 }

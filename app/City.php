@@ -13,4 +13,8 @@ class City extends Model
     public function Theatre() {
         return $this->hasMany(Theatre::class);
     }
+
+    public function User() {
+        return $this->hasMany(User::class);
+    }
 }
