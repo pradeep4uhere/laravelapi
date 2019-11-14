@@ -237,10 +237,15 @@ class UserController extends MasterController
         $orderList = "";
         $id = $request->get('id');
         $order_id = $request->get('order_id');
+        $order_type = $request->get('order_type');
         if($order_id!=''){
-            $orderList = Order::with('OrderStatus','User')->where('id','=',$order_id)->where('user_id','=',$user_id)->paginate(10000);
+            $orderList = Order::with('OrderStatus','User')->where('id','=',$order_id)->where('user_id','=',$user_id)->orderBy('id','DESC')->paginate(1000);
         }else{
-            $orderList = Order::with('OrderStatus','User')->where('user_id','=',$id)->paginate(10000);
+            if($order_type!=''){
+                $orderList = Order::with('OrderStatus','User')->where('order_type','=',$order_type)->where('user_id','=',$id)->orderBy('id','DESC')->paginate(1000);
+            }else{
+                $orderList = Order::with('OrderStatus','User')->where('user_id','=',$id)->orderBy('id','DESC')->paginate(10000);
+            }
         }
 
         //Get User Details
@@ -437,85 +442,144 @@ class UserController extends MasterController
     public function userEventOrderDetails(Request $request){
         $setting = $this->getSetting();
         $orderId = $request->get('order_id');
-        $orderDetails = Order::with('OrderStatus','TempSeatBooking')->where('orderId','=',$orderId)->first()->toArray();
-        //print_r($orderDetails);die;
-        $eventTiming = array();
-        //Formate all the Quantity for the Order  
-        $seatCount  = array();
-        foreach($orderDetails['temp_seat_booking'] as $k=>$item){
-            if(!empty($item['event_seat'])){
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['itinerary']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['includes']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['other']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['dincludes']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['status']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['created_at']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_seat']['created_at']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_timing']['updated_at']);
-                unset($orderDetails['temp_seat_booking'][$k]['event_seat']['updated_at']);
-                unset($orderDetails['temp_seat_booking'][$k]['created_at']);
-                unset($orderDetails['temp_seat_booking'][$k]['updated_at']);
-                $seatTypeName = $this->getSeatingTypeById($item['event_seat']['sitting_type_id']);
-                $orderDetails['temp_seat_booking'][$k]['event_seat']['SeatType']=$seatTypeName['sitting_type_name'];
+        $orderParent = Order::where('orderId','=',$orderId)->get()->toArray();
+        $orderType = 1;
+        $responseArray = array();
+        if(!empty($orderParent)){
+           $orderType = $orderParent[0]['order_type'];
+        }
+
+        if($orderType==1){
+            $responseArray = $this->getEventOrderInvoice($orderId);
+        }
+        if($orderType==2){
+            $responseArray = $this->getTravelOrderInvoice($orderId);
+        }
+
+        return response()->json(['data' => $responseArray], $this->successStatus); 
+        }
+
+
+
+        private function getTravelOrderInvoice($orderId){
+            $setting = $this->getSetting();
+            $orderId = $orderId;
+            $orderDetails = Order::with('OrderStatus','TempSeatBooking','ItineraryBooking')->where('orderId','=',$orderId)->first()->toArray();
+            //print_r($orderDetails);die;
+            $eventTiming = array();
+            //Formate all the Quantity for the Order  
+            $seatCount  = array();
+            $keyArray = array();
+            $finalArray = array();
+            foreach($orderDetails['itinerary_booking'] as $k=>$item){
+                if(!empty($item['itinerary'])){
+                    $orderDetails['itinerary_booking'][$k]['itinerary']['image']=$this->getDefaultImage($item['itinerary']['itinerary_gallery']);
+                }
+                unset($orderDetails['itinerary_booking'][$k]['itinerary']['itinerary_gallery']);
+            }
+        
+            //Get User Details
+        
+            $user = User::find($orderDetails['user_id']);
+            if(!empty($orderDetails)){
+                $responseArray['status'] = 'success';
+                $responseArray['code'] = '200';
+                $responseArray['orderDetails'] = array($orderDetails);
+                $responseArray['User'] = $user;
+                $responseArray['settings'] = $setting;
+
 
                 
-                $theatreName = $this->getTheatreById($item['event_seat']['theatre_id']);
-                $orderDetails['temp_seat_booking'][$k]['event_seat']['Theatre']=$theatreName['theater_name'];
-
-                //Get All Price List of this Event Timing
-                $sitting_type_id = $orderDetails['temp_seat_booking'][$k]['event_seat']['sitting_type_id'];
-                $event_timing_id = $orderDetails['temp_seat_booking'][$k]['event_timing']['id'];
-                $price = $this->getPriceByEventTiming($event_timing_id,$sitting_type_id);
-                $orderDetails['temp_seat_booking'][$k]['event_seat']['Price']=$price['price'];
-
-                $event = $this->getEventDetailsByEventDetailsID($item['event_timing']['event_detail_id']);
-                if($event['event_detail'][0]['event_timing'][0]['id']==$event_timing_id){
-                    $orderDetails['temp_seat_booking'][$k]['Event']=$event['event_detail'][0]['event'];
-                    $orderDetails['temp_seat_booking'][$k]['EventImage']=$event['imagesList'];
-                }
-                $eventTiming[$item['event_timing_id']][]=array('event'=>$event,'seat'=>$item['event_seat']);
-                $seatCount[$item['event_timing_id']][]=array($orderDetails['temp_seat_booking'][$k]['event_seat']['position_row'].$orderDetails['temp_seat_booking'][$k]['event_seat']['position_column']);
-               
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = "User not found!!.";
             }
+            return $responseArray;
         }
-        
-       $eventDetailArrayWithSeat = array();
-       foreach($eventTiming as $k=>$finalItem){
-            $eventDetailArray[]=$finalItem;
-       }
-        $keyArray = array();
-        $finalArray = array();
-        if(!empty($orderDetails['temp_seat_booking'])){
+
+
+        private function getEventOrderInvoice($orderId){
+            $setting = $this->getSetting();
+            $orderDetails = Order::with('OrderStatus','TempSeatBooking')->where('orderId','=',$orderId)->first()->toArray();
+            //print_r($orderDetails);die;
+            $eventTiming = array();
+            //Formate all the Quantity for the Order  
+            $seatCount  = array();
             foreach($orderDetails['temp_seat_booking'] as $k=>$item){
-                if(!array_key_exists($item['event_timing_id'],$keyArray)){    
-                    if(array_key_exists($item['event_timing_id'],$seatCount)){
-                        $orderDetails['temp_seat_booking'][$k]['Seat'] =  $seatCount[$item['event_timing_id']];   
+                if(!empty($item['event_seat'])){
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['itinerary']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['includes']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['other']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['dincludes']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['status']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['created_at']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_seat']['created_at']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_timing']['updated_at']);
+                    unset($orderDetails['temp_seat_booking'][$k]['event_seat']['updated_at']);
+                    unset($orderDetails['temp_seat_booking'][$k]['created_at']);
+                    unset($orderDetails['temp_seat_booking'][$k]['updated_at']);
+                    $seatTypeName = $this->getSeatingTypeById($item['event_seat']['sitting_type_id']);
+                    $orderDetails['temp_seat_booking'][$k]['event_seat']['SeatType']=$seatTypeName['sitting_type_name'];
+
+                    
+                    $theatreName = $this->getTheatreById($item['event_seat']['theatre_id']);
+                    $orderDetails['temp_seat_booking'][$k]['event_seat']['Theatre']=$theatreName['theater_name'];
+
+                    //Get All Price List of this Event Timing
+                    $sitting_type_id = $orderDetails['temp_seat_booking'][$k]['event_seat']['sitting_type_id'];
+                    $event_timing_id = $orderDetails['temp_seat_booking'][$k]['event_timing']['id'];
+                    $price = $this->getPriceByEventTiming($event_timing_id,$sitting_type_id);
+                    $orderDetails['temp_seat_booking'][$k]['event_seat']['Price']=$price['price'];
+
+                    $event = $this->getEventDetailsByEventDetailsID($item['event_timing']['event_detail_id']);
+                    if($event['event_detail'][0]['event_timing'][0]['id']==$event_timing_id){
+                        $orderDetails['temp_seat_booking'][$k]['Event']=$event['event_detail'][0]['event'];
+                        $orderDetails['temp_seat_booking'][$k]['EventImage']=$event['imagesList'];
                     }
-                    $finalArray[] = $orderDetails['temp_seat_booking'][$k];
-                    $keyArray[$item['event_timing_id']]=$item['event_timing_id'];
+                    $eventTiming[$item['event_timing_id']][]=array('event'=>$event,'seat'=>$item['event_seat']);
+                    $seatCount[$item['event_timing_id']][]=array($orderDetails['temp_seat_booking'][$k]['event_seat']['position_row'].$orderDetails['temp_seat_booking'][$k]['event_seat']['position_column']);
+                
                 }
             }
-        }
-
-        //Get User Details
-        $user = User::find($orderDetails['user_id']);
-        if(!empty($orderDetails)){
-            $responseArray['status'] = 'success';
-            $responseArray['code'] = '200';
-            $responseArray['orderDetails'] = $orderDetails;
-            $responseArray['orderDetails']['temp_seat_booking'] = $finalArray;
-            $responseArray['User'] = $user;
-            $responseArray['settings'] = $setting;
-
-
             
-        }else{
-            $responseArray['status'] = 'error';
-            $responseArray['code'] = '500';
-            $responseArray['message'] = "User not found!!.";
+        $eventDetailArrayWithSeat = array();
+        foreach($eventTiming as $k=>$finalItem){
+                $eventDetailArray[]=$finalItem;
         }
-        return response()->json(['data' => $responseArray], $this->successStatus); 
-    }
+            $keyArray = array();
+            $finalArray = array();
+            if(!empty($orderDetails['temp_seat_booking'])){
+                foreach($orderDetails['temp_seat_booking'] as $k=>$item){
+                    if(!array_key_exists($item['event_timing_id'],$keyArray)){    
+                        if(array_key_exists($item['event_timing_id'],$seatCount)){
+                            $orderDetails['temp_seat_booking'][$k]['Seat'] =  $seatCount[$item['event_timing_id']];   
+                        }
+                        $finalArray[] = $orderDetails['temp_seat_booking'][$k];
+                        $keyArray[$item['event_timing_id']]=$item['event_timing_id'];
+                    }
+                }
+            }
+
+            //Get User Details
+            $user = User::find($orderDetails['user_id']);
+            if(!empty($orderDetails)){
+                $responseArray['status'] = 'success';
+                $responseArray['code'] = '200';
+                $responseArray['orderDetails'] = $orderDetails;
+                $responseArray['orderDetails']['temp_seat_booking'] = $finalArray;
+                $responseArray['User'] = $user;
+                $responseArray['settings'] = $setting;
+
+
+                
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = "Order not found!!.";
+            }
+            return $responseArray;
+        }
 
 
 
@@ -525,7 +589,7 @@ class UserController extends MasterController
             {
                 $data = $request->all();
                 $id= $data['id'];
-                $user = User::with('Order','City','Country')->find($id)->toArray();
+                $user = User::with('Order','State','City','Country')->find($id)->toArray();
                 if(!empty($user)){
                     $responseArray['status'] = 'success';
                     $responseArray['code'] = '200';

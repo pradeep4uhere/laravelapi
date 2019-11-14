@@ -157,7 +157,17 @@ class OrderController extends MasterController
     	//Get All the Data into Foramte
     	$orderObj = new  Order();
     	if($userDetails){
-    		$orderData['user_id']		= $userDetails->id;	
+				if($request->get('user_id')){
+					$userID = $request->get('user_id');
+					$userArr= User::where('id','=',$userID)->get();
+					if(count($userArr)>0){
+						$orderData['user_id']		= $userID;
+					}else{
+						$orderData['user_id']		= $userDetails->id;
+					}	
+				}else{
+					$orderData['user_id']		= $userDetails->id;	
+				}
     	}else{
             try{
                 $user = array();
@@ -184,8 +194,8 @@ class OrderController extends MasterController
             }
     	}
     	$orderData['orderID']			= time();
-		$orderData['order_status_id']	= '1';
-		$orderData['order_type']		= '1';
+			$orderData['order_status_id']	= '1';
+			$orderData['order_type']		= '1';
     	$orderData['email_address']		= $request->get('email');
     	$orderData['session']			= $request->get('user_id');
     	$orderData['order_date']		= date('Y-m-d H:i:s');
@@ -226,7 +236,7 @@ class OrderController extends MasterController
         
     	
         $id = Order::create($orderData)->id;
-    	if($id>0){
+    		if($id>0){
     			//Save All Event Timing and Seats for this order
     			$this->saveEventTimeAndSeat($request,$id);
     			$orderArr = Order::find($id);

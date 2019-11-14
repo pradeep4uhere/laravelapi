@@ -23,6 +23,7 @@ use App\ItineraryDay;
 use App\ItineraryDayGallery;
 use App\ItineraryGallery;
 use App\City;
+use App\State;
 
 
 class FrontController extends MasterController
@@ -34,6 +35,56 @@ class FrontController extends MasterController
         $array = ['apiTest'=>'OK'];
         return response()->json($array);
     }
+
+    
+
+    public function getAllCity(Request $request){
+        try{
+            
+            $id= $request->get('id');
+            if($id!=''){
+                $cityArr = City::where('state_id','=',$id)->where('status','=',1)->get()->toArray();
+            }else{
+                $cityArr = City::where('status','=',1)->get()->toArray();
+            }
+            //Get all Review List
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['cityList'] = $cityArr;
+            
+        }catch (Exception $e) {
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = $e->getMessage();
+        }
+        return response()->json($responseArray);
+    }
+
+
+
+    public function getAllState(Request $request){
+        try{
+            
+            $id= $request->get('id');
+            if($id!=''){
+                $stateArr = State::find($id);
+            }else{
+                $stateArr = State::where('status','=',1)->get()->toArray();
+            }
+            //Get all Review List
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['stateList'] = $stateArr;
+            
+        }catch (Exception $e) {
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = $e->getMessage();
+        }
+        return response()->json($responseArray);
+    }
+
+
 
 
 
@@ -75,10 +126,14 @@ class FrontController extends MasterController
             //Formate Event Array
             $eventFinalArr = array();
             foreach ($eventItem as $value) {
+                // echo "<pre>";
+                // print_r($value);
+                // die;
                 $eventFinalArr[]=array(
                     'event_id'=>$value['id'],
                     'id'=>$value['event_detail'][0]['event_timing'][0]['id'],
-                    'title'=>$value['event_detail'][0]['event_timing'][0]['theatre']['theater_name'],
+                    'title'=>$value['event_detail'][0]['event']['title'],
+                    //'title'=>$value['event_detail'][0]['event_timing'][0]['theatre']['theater_name'],
                     'place'=>$value['event_detail'][0]['city']['city_name'],
                     'price'=>$priceType.$value['event_detail'][0]['event_timing'][0]['price'][0]['price'],
                     'image'=>$this->getEventImage($value['event_gallery']),

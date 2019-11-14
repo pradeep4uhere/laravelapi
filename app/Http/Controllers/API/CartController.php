@@ -627,8 +627,8 @@ class CartController extends MasterController
 	    	//Get Event Details
 	    	$eventDetails = EventDetail::where('id','=',$eventtiming['event_detail_id'])->first()->toArray();
 	    	$event = Event::with('EventDetail','EventGallery')->find($eventDetails['event_id'])->toArray();
-			
-	    	$theatrename = $eventtiming['theatre']['theater_name'];
+			$eventName = $event['event_detail'][0]['event']['title'];
+			$theatrename = $eventtiming['theatre']['theater_name'];
 	    	$eventImage =  $this->getEventImage($event['event_gallery']);
 	    	$responseArray['message'] =$eventDetails;
 	        //return response()->json($responseArray);
@@ -645,7 +645,7 @@ class CartController extends MasterController
 			$itmeId  = $event_timing_id.'-'.$seatArr[0];
 			$cartArray = array(
 				'id'=>$itmeId,
-				'name'=>$theatrename,
+				'name'=>$eventName,
 				'price'=>$seatArr[1],
 				'quantity' => 1,
 				'attributes' => $attributes

@@ -179,6 +179,10 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('userdetails'          , 'API\UserController@userDetails')->name('userdetails');
     Route::any('updateuser'           , 'API\UserController@userUpdateProfile')->name('updateuser');
     Route::any('usereventorderdetails', 'API\UserController@userEventOrderDetails');
+    Route::any('getallstate'          , 'API\FrontController@getAllState')->name('getallstate');
+    Route::any('getallcity'          , 'API\FrontController@getAllCity')->name('getallcity');
+    
+    
     
 });
 
