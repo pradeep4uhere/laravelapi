@@ -252,11 +252,10 @@ class EventController extends MasterController
         $eventDetails['event_end_time']     = $request->get('event_end_time');
         $eventDetails['status']             = $request->get('status');
 
-        $eventDetails['itinerary']          = $body['itinerary'];
-        $eventDetails['includes']           = $body['includes'];
-        $eventDetails['dincludes']          = $body['dincludes'];
-        $eventDetails['other']              = $body['other'];
-
+        $eventDetails['itinerary']          = $request->get('itinerary');
+        $eventDetails['includes']           = $request->get('includes');
+        $eventDetails['dincludes']          = $request->get('dincludes');
+        $eventDetails['other']              = $request->get('other');
         
         $eventDetails['created_at']         = self::getCreatedDate();
         //echo "<pre>";
