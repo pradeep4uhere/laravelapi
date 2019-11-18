@@ -159,7 +159,7 @@ class DestinationController extends MasterController
             $destination->climate = $climate;
             $destination->population = $population;
             $destination->shopping = $shopping;
-            $destination->more = $more;
+            $destination->more_information = $more;
             $destination->cuisine = $cuisine;
             $destination->status = $status;
             

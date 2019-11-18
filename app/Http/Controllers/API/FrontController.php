@@ -134,13 +134,22 @@ class FrontController extends MasterController
                     'id'=>$value['event_detail'][0]['event_timing'][0]['id'],
                     'title'=>$value['event_detail'][0]['event']['title'],
                     //'title'=>$value['event_detail'][0]['event_timing'][0]['theatre']['theater_name'],
-                    'place'=>$value['event_detail'][0]['city']['city_name'],
+                    //'place'=>$value['event_detail'][0]['city']['city_name'],
+                    'place'=>$this->getCityNameById($value['event_detail'][0]['event_timing'][0]['theatre']['city_id']),
                     'price'=>$priceType.$value['event_detail'][0]['event_timing'][0]['price'][0]['price'],
                     'image'=>$this->getEventImage($value['event_gallery']),
                 );
             }
+            
+            $chunk =array_chunk($eventFinalArr,4);
+            $finalItem = array();
+            foreach($chunk as $key=>$value){
+                $finalItem['item_'.$key] = $value;
+            }
+            // print_r($finalItem);
+            // die;
             $responseArray['status'] = 'success';
-            $responseArray['event'] = $eventFinalArr;
+            $responseArray['event'] = $chunk;
             $responseArray['code'] = '200';
 
         }else{
@@ -169,6 +178,12 @@ class FrontController extends MasterController
             $responseArray['message'] = $e->getMessage();
         }
         return response()->json($responseArray);
+    }
+
+
+    public function getCityNameById($id){
+        $cityArr = City::find($id);
+        return $cityArr['city_name'];
     }
 
 

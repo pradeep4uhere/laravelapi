@@ -381,6 +381,7 @@ class EventController extends MasterController
             $event = Event::find($data['id']);
             $event->title = trim($data['title']);
             $event->description = trim($data['description']);
+            $event->long_description = trim($data['long_description']);
             $event->durration = $data['durration'];
             $event->status = $data['status'];
             $event->is_feature=$data['is_feature'];
@@ -565,7 +566,7 @@ class EventController extends MasterController
     
          $id = $request->get('id');
          $eventImage = EventGallery::find($id);
-         DB::table('event_galleries')->where(['event_id'=>$id])->update(['is_default' => 0]);
+         DB::table('event_galleries')->where(['event_id'=>$eventImage->event_id])->update(['is_default' => 0]);
          if($eventImage->is_default==0){
             $eventImage->is_default = 1;
          }else{
