@@ -482,43 +482,68 @@ class FrontController extends MasterController
     public function getAllEventList(Request $request){
         try{
             $all = $request->all();
+            $page_no = $all['page_no'];
             $globalArr = Setting::all();
 
             $priceType = $globalArr['14']['options_value'];
             $eventItem = array();
-            $events = Event::with('EventDetail','EventGallery')->where('status','=',1)->orderBy('id', 'desc')->paginate(6);
+            $events = Event::with('EventDetail','EventGallery')->where('status','=',1)->orderBy('id', 'ASC')->paginate(400);
             $event = $events->toArray();
-           
+            
+
+            // echo "<pre>";
+            // print_r($event);
+            // die;
+            $allEventList = array();
             foreach($event['data'] as $item){
                 if(!empty($item['event_detail'])){
                     if(!empty($item['event_detail'][0]['event_timing'])){
+                        foreach($item['event_detail'][0]['event_timing'] as $k=>$v){
+                            if($item['event_detail'][0]['event_timing'][$k]['status']==1){
+                                unset($item['event_detail'][0]['event_timing'][$k]['theatre']['event_seat']); 
+                                $allEventList[]  = array(
+                                    'event_id'=>$item['id'],
+                                    'event_details_id'=>$item['event_detail'][0]['id'],
+                                    'id'=>$item['event_detail'][0]['event_timing'][$k]['id'],
+                                    'start_time'=>$item['event_detail'][0]['event_timing'][$k]['event_start_time'],
+                                    'end_time'=>$item['event_detail'][0]['event_timing'][$k]['event_end_time'],
+                                    'title'=>$item['event_detail'][0]['event']['title'],
+                                    'place'=>$this->getCityNameById($item['event_detail'][0]['event_timing'][$k]['theatre']['city_id']),
+                                    'price'=>$priceType.$item['event_detail'][0]['event_timing'][$k]['price'][0]['price'],
+                                    'image'=>$this->getEventImage($item['event_gallery']),
+                                ); 
+                            }  
+                        }
                         $eventItem[]=$item;
                     }
                 }
             }
-
-            //Formate Event Array
+            
             $eventFinalArr = array();
-            foreach ($eventItem as $value) {
-                $eventFinalArr[]=array(
-                    'event_id'=>$value['id'],
-                    'event_details_id'=>$value['event_detail'][0]['id'],
-                    'id'=>$value['event_detail'][0]['event_timing'][0]['id'],
-                    'title'=>$value['event_detail'][0]['event_timing'][0]['theatre']['theater_name'],
-                    'place'=>$value['event_detail'][0]['city']['city_name'],
-                    'price'=>$priceType.$value['event_detail'][0]['event_timing'][0]['price'][0]['price'],
-                    'image'=>$this->getEventImage($value['event_gallery']),
-                );
+            $chunkArray = array_chunk($allEventList,4);
+            if($page_no>count($chunkArray)){
+                $responseArray['status'] = false;
+                $responseArray['code'] = 500;
+                $responseArray['message'] = "No More Events";
+            }else{
+                $eventList = $chunkArray[0];
+                if($page_no > 0){
+                    $eventList = $chunkArray[$page_no];
+                }
+
+                $responseArray['status'] = true;
+                $responseArray['code'] = 200;
+                $responseArray['eventFinalArr'] =$eventList;
+                //unset($event['data']);
+                //$responseArray['eventPaginationData'] =$event;
+                $responseArray['setting'] =$globalArr;
+                if(($page_no+1)<count($chunkArray)){
+                    $responseArray['next_page'] =$page_no+1;
+                }else{
+                    $responseArray['next_page'] ='-1';
+                }
+                $responseArray['total'] =count($allEventList);
             }
-            $responseArray['status'] = true;
-            $responseArray['code'] = 200;
-            $responseArray['eventFinalArr'] =$eventFinalArr;
-            unset($event['data']);
-            $responseArray['eventPaginationData'] =$event;
-            $responseArray['setting'] =$globalArr;
-            
-            
-            
         }catch (Exception $e) {
             $responseArray['status'] = false;
             $responseArray['code'] = 500;
