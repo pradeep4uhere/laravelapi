@@ -216,7 +216,7 @@ class FrontController extends MasterController
                 $eventId = $idStr[0];
                 $eventTimingId = $idStr[1];
             }
-            $eventDetails = Event::with('EventDetail','EventGallery')->where('id','=',$id)->orderBy('id', 'desc')->get()->toArray();
+            $eventDetails = Event::with('EventDetail','EventGallery')->where('id','=',$id)->where('status','=',1)->orderBy('id', 'desc')->get()->toArray();
 
             //Select Event Timing What User Clicked On Event e.g Timing ID 
             if(!empty($eventDetails)){
@@ -246,8 +246,9 @@ class FrontController extends MasterController
                 $title = $eventDetails[0]['title']; 
                 $durration = $eventDetails[0]['durration']; 
                 $description = $eventDetails[0]['description']; 
+                $long_description = $eventDetails[0]['long_description'];
                 $banner = env('APP_URL').'/storage/app/public/event/'.$eventDetails[0]['banner'];
-                $eventParent = array('id'=>$eid, 'title'=>$title, 'durration'=>$durration,'description'=>$description,'banner'=>$banner);
+                $eventParent = array('id'=>$eid, 'title'=>$title, 'durration'=>$durration,'description'=>$description,'banner'=>$banner,'long_description'=>$long_description);
             }else{
                 $eventParent = array();
                 $eventTiming = array();
