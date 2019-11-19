@@ -108,7 +108,7 @@ class FrontController extends MasterController
     		foreach ($event_gallery as $key => $value) {
     			if($value['is_feature']==1){
                     $isFeature = true;
-    				return env('APP_URL').'/storage/app/public/event/'.$value['image'];
+    				return env('APP_URL').'/storage/app/public/event/resize/683X739/'.$value['image'];
     			}
             }
             if($isFeature===false){
@@ -246,8 +246,8 @@ class FrontController extends MasterController
                 //storage/app/public/event/4003590a7e9a52292ca2526a74a58a11.jpeg
                 if(!empty($eventDetails[0]['event_gallery'])){
                     foreach($eventDetails[0]['event_gallery'] as $imageItem){
-                        $url = env('APP_URL').'/storage/app/public/event/'.$imageItem['image_thumb'];
-                        $durl = env('APP_URL').'/storage/app/public/event/'.$imageItem['image_thumb'];
+                        $url = env('APP_URL').'/storage/app/public/event/resize/1139X627/'.$imageItem['image_thumb'];
+                        $durl = env('APP_URL').'/storage/app/public/event/resize/372X253/'.$imageItem['image_thumb'];
                         $image[]=array(
                                 'original'=>"$url",
                                 'thumbnail'=>"$durl"

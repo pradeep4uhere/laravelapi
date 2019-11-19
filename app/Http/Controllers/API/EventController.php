@@ -467,8 +467,6 @@ class EventController extends MasterController
                 $datas = base64_decode($data);
                 $typeArr = explode('/', $type);
                 $file = md5(uniqid()) . '.'.end($typeArr);
-                $resize = \Image::make(base64_decode($data))->fit(300);
-                Storage::disk('event/resize')->put($file, $resize);
                 Storage::disk('event')->put($file, base64_decode($data));
                 if($this->saveEventImage($id,$file)){
                     
@@ -541,11 +539,35 @@ class EventController extends MasterController
         $eventGallery['created_at'] = self::getCreatedDate();
         if($eventGallery->save()){
             $lastId= $eventGallery->id;
+            $this->resizeImage($lastId);
 //            $this->reSize
             return $eventGallery->id;
         }else{
             return false;
         }
+    }
+
+
+    private function resizeImage($id){
+        $imageArr = EventGallery::find($id);
+        $imageUrl = env('APP_URL').'/storage/app/public/event/'.$imageArr['image'];
+        $resize = \Image::make($imageUrl);
+        // resize image to fixed size 683X349,683X739,1139x627,372X253
+        $resize->resize(683,349)->save($imageArr['image']);
+        Storage::disk('event/resize/683X349')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 683X739
+        $resize->resize(683,739)->save($imageArr['image']);
+        Storage::disk('event/resize/683X739')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 1139X627
+        $resize->resize(1139,627)->save($imageArr['image']);
+        Storage::disk('event/resize/1139X627')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 372X253
+        $resize->resize(372,253)->save($imageArr['image']);
+        Storage::disk('event/resize/372X253')->put($imageArr['image'], $resize);
+
     }
 
 

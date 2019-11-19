@@ -66,6 +66,30 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        'event/resize/683X349' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/event/resize/683X349'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'event/resize/683X739' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/event/resize/683X739'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'event/resize/372X253' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/event/resize/372X253'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'event/resize/1139X627' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/event/resize/1139X627'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
         'itinerary' => [
             'driver' => 'local',
             'root' => storage_path('app/public/itinerary'),
