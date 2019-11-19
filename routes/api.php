@@ -66,6 +66,7 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('eventimagedelete'   , 'API\EventController@deleteEventImage');
     Route::any('eventimagedefault'  , 'API\EventController@defaultEventImage');
     Route::any('updateeventstatusimage'  , 'API\EventController@updateEventImageStatus');
+    Route::any('updateeventstatusfeatureimage'  , 'API\EventController@updateEventFeatureImageStatus');
     Route::any('deleteevent'        , 'API\EventController@deleteEvent');
 
     

@@ -92,10 +92,32 @@ class FrontController extends MasterController
     	if(!empty($event_gallery)){
     		$count=1;
     		foreach ($event_gallery as $key => $value) {
-    			if($count==1){
+    			if($value['is_default']==1){
     				return env('APP_URL').'/storage/app/public/event/'.$value['image'];
     			}
     		}
+    	}
+    }
+
+
+
+    private function getEventFeatureImage($event_gallery){
+    	if(!empty($event_gallery)){
+            $count=1;
+            $isFeature = false;
+    		foreach ($event_gallery as $key => $value) {
+    			if($value['is_feature']==1){
+                    $isFeature = true;
+    				return env('APP_URL').'/storage/app/public/event/'.$value['image'];
+    			}
+            }
+            if($isFeature===false){
+                foreach ($event_gallery as $key => $value) {
+                    if($value['is_default']==1){
+                        return env('APP_URL').'/storage/app/public/event/'.$value['image'];
+                    }
+                }   
+            }
     	}
     }
 
@@ -511,7 +533,7 @@ class FrontController extends MasterController
                                     'title'=>$item['event_detail'][0]['event']['title'],
                                     'place'=>$this->getCityNameById($item['event_detail'][0]['event_timing'][$k]['theatre']['city_id']),
                                     'price'=>$priceType.$item['event_detail'][0]['event_timing'][$k]['price'][0]['price'],
-                                    'image'=>$this->getEventImage($item['event_gallery']),
+                                    'image'=>$this->getEventFeatureImage($item['event_gallery']),
                                 ); 
                             }  
                         }

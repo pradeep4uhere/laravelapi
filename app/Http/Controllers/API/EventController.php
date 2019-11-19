@@ -425,7 +425,7 @@ class EventController extends MasterController
         if(count($imageArr)>0){
                 $responseArray['status'] = true;
                 $responseArray['code']= "200";
-                $responseArray['message']= "Image updated Successfully!!";
+                $responseArray['message']= "Image updated Successfully!!..";
                 $responseArray['images']= $imageArr;
             }else{
                 $responseArray['status'] = false;
@@ -467,8 +467,11 @@ class EventController extends MasterController
                 $datas = base64_decode($data);
                 $typeArr = explode('/', $type);
                 $file = md5(uniqid()) . '.'.end($typeArr);
+                $resize = \Image::make(base64_decode($data))->fit(300);
+                Storage::disk('event/resize')->put($file, $resize);
                 Storage::disk('event')->put($file, base64_decode($data));
                 if($this->saveEventImage($id,$file)){
+                    
                     /*
                     src: "https://c2.staticflickr.com/9/8356/28897120681_3b2c0f43e0_b.jpg",
                     thumbnail: "https://c2.staticflickr.com/9/8356/28897120681_3b2c0f43e0_n.jpg",
@@ -506,6 +509,7 @@ class EventController extends MasterController
                 "caption"=>"",
                 "id"=>$item['id'],
                 "is_default"=>$item['is_default'],
+                "is_feature"=>$item['is_feature'],
                 "status"=>$item['status'],
             );
         }
@@ -536,7 +540,9 @@ class EventController extends MasterController
         $eventGallery['status'] = '1';
         $eventGallery['created_at'] = self::getCreatedDate();
         if($eventGallery->save()){
-            return true;
+            $lastId= $eventGallery->id;
+//            $this->reSize
+            return $eventGallery->id;
         }else{
             return false;
         }
@@ -587,10 +593,34 @@ class EventController extends MasterController
 
 
 
-
+    
     
 
-    public function updateEventImageStatus(Request $request){
+    public function updateEventFeatureImageStatus(Request $request){
+    
+        $id = $request->get('id');
+         $eventImage = EventGallery::find($id);
+         DB::table('event_galleries')->where(['event_id'=>$eventImage->event_id])->update(['is_feature' => 0]);
+         if($eventImage->is_feature==0){
+            $eventImage->is_feature = 1;
+         }else{
+            $eventImage->is_feature = 0;
+         }
+         if($eventImage->save()){
+             $responseArray['status'] = true;
+             $responseArray['code']= "200";
+             $responseArray['message']= "Image set as feature Successfully!!";
+         }else{
+             $responseArray['status'] = false;
+             $responseArray['code']= "500";
+             $responseArray['message']= "Image not set as default !!";
+         }
+         return response()->json(['data' => $responseArray], $this->successStatus); 
+   
+   }
+   
+   
+   public function updateEventImageStatus(Request $request){
     
          $id = $request->get('id');
          $eventImage = EventGallery::find($id);

@@ -60,13 +60,19 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        'event/resize' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/event/resize'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
         'itinerary' => [
             'driver' => 'local',
             'root' => storage_path('app/public/itinerary'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
-    'itineraryday' => [
+        'itineraryday' => [
             'driver' => 'local',
             'root' => storage_path('app/public/itineraryday'),
             'url' => env('APP_URL').'/storage',

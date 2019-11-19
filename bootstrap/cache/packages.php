@@ -20,6 +20,20 @@
       0 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
     ),
   ),
+  'fideloper/proxy' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
+    ),
+  ),
+  'laravel/passport' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Passport\\PassportServiceProvider',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
@@ -38,18 +52,15 @@
       'Cart' => 'Darryldecode\\Cart\\Facades\\CartFacade',
     ),
   ),
-  'fideloper/proxy' => 
+  'intervention/image' => 
   array (
     'providers' => 
     array (
-      0 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
+      0 => 'Intervention\\Image\\ImageServiceProvider',
     ),
-  ),
-  'laravel/passport' => 
-  array (
-    'providers' => 
+    'aliases' => 
     array (
-      0 => 'Laravel\\Passport\\PassportServiceProvider',
+      'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
   ),
 );
