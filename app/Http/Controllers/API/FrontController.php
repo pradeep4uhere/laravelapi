@@ -554,6 +554,12 @@ class FrontController extends MasterController
                     $eventList = $chunkArray[$page_no];
                 }
 
+                //Set the Image Size
+                foreach($eventList as $key=>$item){
+                    if($key==0 || $key==3){ 
+                        $eventList[$key]['image'] = str_replace('683X739','683X349',$item['image']);
+                    }
+                }
                 $responseArray['status'] = true;
                 $responseArray['code'] = 200;
                 $responseArray['eventFinalArr'] =$eventList;
