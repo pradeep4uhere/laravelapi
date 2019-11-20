@@ -360,7 +360,7 @@ class DestinationController extends MasterController
     
          $id = $request->get('id');
          $eventImage = DestinationGallery::find($id);
-         DB::table('event_galleries')->update(['is_default' => 0]);
+         DB::table('destination_galleries')->update(['is_default' => 0]);
          if($eventImage->is_default==0){
             $eventImage->is_default = 1;
          }else{

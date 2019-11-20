@@ -85,6 +85,9 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('itinerarydayimageupload', 'API\ItineraryController@dayImageUpload');
     Route::any('itinerarydayimagedefault'  , 'API\ItineraryController@defaultdayImage');
     Route::any('itinerarydayimagedelete'   , 'API\ItineraryController@deletedayImage');
+    Route::any('itineraryaddondelete'     , 'API\ItineraryController@itineraryAddonDelete');
+    Route::any('updateitineraryaddon'     , 'API\ItineraryController@updateItineraryAddon');
+    
     
     
     

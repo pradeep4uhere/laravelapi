@@ -214,7 +214,7 @@ class FrontController extends MasterController
             $settingArr = Setting::all();
 
             //Get all Review List
-            $reviewVideos = ReviewVideo::where('status','=',1)->get();
+            $reviewVideos = ReviewVideo::where('status','=',1)->limit(3)->get();
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
             $responseArray['data'] =array('setting'=>$settingArr,'review'=>$reviewVideos);
@@ -316,6 +316,7 @@ class FrontController extends MasterController
                 if(!empty($settingArr[0]['destination_gallery'])){
                         foreach($settingArr[0]['destination_gallery'] as $k=>$v){
                              $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                            
                              $settingArr[0]['destination_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url);
                         }     
                     }else{
@@ -324,11 +325,19 @@ class FrontController extends MasterController
             }else{
                 $settingArr = Destination::with('DestinationGallery')->where('status','=',1)->orderBy('trip_type',$typeSort)->get()->toArray();
                 //set All the Image Path 
+               
                 foreach($settingArr as $key=>$value){
+                    
                     if(!empty($value['destination_gallery'])){
                         foreach($value['destination_gallery'] as $k=>$v){
-                             $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
-                             $settingArr[$key]['destination_gallery'][$k]=$url;
+                            if($v['is_default']==1){
+                                $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                                $settingArr[$key]['destination_gallery'][0]=$url;
+                            }else{
+                                $url='';
+                                $settingArr[$key]['destination_gallery'][$k]=$url;
+                            }
+                            
                         }    
                     }else{
                         $settingArr[$key]['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';
@@ -365,7 +374,7 @@ class FrontController extends MasterController
             
             if(array_key_exists('id', $all) && !empty($request->get('id'))){
                 $id = $request->get('id'); 
-                $settingArr = Itinerary::with('ValidItineraryDeparture','ItineraryDay','ItineraryGallery')->where('status','=',1)->where('id','=',$id)->get()->toArray();
+                $settingArr = Itinerary::with('ValidItineraryDeparture','ItineraryAddon','ItineraryTermsAndConditions','ItineraryDay','ItineraryGallery')->where('status','=',1)->where('id','=',$id)->get()->toArray();
                 //print_r($settingArr[0]['destination_gallery']);die;
                 if(!empty($settingArr[0]['itinerary_gallery'])){
                         foreach($settingArr[0]['itinerary_gallery'] as $k=>$v){

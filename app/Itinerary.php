@@ -23,6 +23,17 @@ class Itinerary extends Model
         return $this->hasMany(ItineraryDeparture::class)->where('status','=', 1)->where('start_date', '>', \DB::raw('NOW()'))->orderBy('price','ASC');
     }
 
+    
+    public function ItineraryAddon() {
+        return $this->hasMany(ItineraryAddon::class)->where('type','=', 1);
+    }
+
+    public function ItineraryTermsAndConditions() {
+        return $this->hasMany(ItineraryAddon::class)->where('type','=', 2);;
+    }
+
+    
+
 
 
 }

@@ -21,6 +21,7 @@ use App\ItineraryGallery;
 use App\ItineraryDeparture;
 use App\ItineraryDay;
 use App\ItineraryDayGallery;
+use App\ItineraryAddon;
 
 class ItineraryController extends MasterController
 {
@@ -284,7 +285,7 @@ class ItineraryController extends MasterController
 		$setting = Setting::all();
         $responseArray = array();
         $id = $request->get('id');
-        $event = Itinerary::with('ItineraryDeparture')->find($id);
+        $event = Itinerary::with('ItineraryDeparture','ItineraryAddon','ItineraryTermsAndConditions')->find($id);
         if(!empty($event)){
             $responseArray['status'] = true;
             $responseArray['code']= "200";
@@ -431,6 +432,44 @@ class ItineraryController extends MasterController
     }
 
 
+    
+    public function updateItineraryAddon(Request $request){
+        $body = $request->get('body');
+        $id = $request->get('id');
+        if($id>0 || $id!=''){
+            $eventDetails = ItineraryAddon::find($id);
+        }else{
+            $eventDetails = new ItineraryAddon();
+        }
+        $itinerary_id = $request->get('itinerary_id');
+        $eventDetails['itinerary_id']   = $itinerary_id;
+        $eventDetails['title']          = $request->get('title');
+        $eventDetails['descriptions']   = $request->get('description');
+        $type = $request->get('type');
+        if($type==1){
+            $eventDetails['type']   = 1;
+        }
+        if($type==2){
+            $eventDetails['type']   = 2;
+        }
+        
+        
+        $eventDetails['status']         = $request->get('status');
+        $eventDetails['created_at']     = self::getCreatedDate();
+      
+        if($eventDetails->save()){
+            $responseArray['status'] = 'success';
+            $responseArray['code']= "200";
+            $responseArray['message']= "itinerary addon updated."; 
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code']= "500";
+            $responseArray['message']= "Somthing went wrong, Please try after sometime.";
+        }
+        return response()->json([$responseArray]);
+
+    }
+
 
     /*
      *@Author       :: Pradeep Kumar
@@ -515,6 +554,30 @@ class ItineraryController extends MasterController
                 $responseArray['status'] = 'success';
                 $responseArray['code']= 200;
                 $responseArray['message']= "Itinerary Day Deleted."; 
+            }else{
+                $responseArray['status'] = 'errro';
+                $responseArray['code']= 500;
+                $responseArray['message']= "somthing went wrong, plz try after sometime"; 
+            }
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code']= 500;
+            $responseArray['message']= "Invalid request, No Event Timing found.";
+        }
+        return response()->json([$responseArray]);
+    }
+
+
+
+    public function itineraryAddonDelete(Request $request){
+        $id = $request->get('id');
+        $eventtiming = $eventDetails = ItineraryAddon::find($id);
+        if(!empty($eventtiming)){
+            //$eventtiming->delete()
+            if($eventtiming->delete()){
+                $responseArray['status'] = 'success';
+                $responseArray['code']= 200;
+                $responseArray['message']= "Itinerary Addon Deleted."; 
             }else{
                 $responseArray['status'] = 'errro';
                 $responseArray['code']= 500;

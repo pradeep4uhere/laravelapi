@@ -478,10 +478,18 @@ class GeneralController extends MasterController
             $pageList->url      = $url;
             $pageList->status   = $status;
 
-            $validator = Validator::make($request->all(), [
-                'title' => 'required|unique:review_videos|max:255',
-                'url'=> 'required',
-            ]);
+            if($id!=''){
+                $validator = Validator::make($request->all(), [
+                    'title' => 'required|unique:review_videos,title,'.$id,
+                    'url'=> 'required',
+                ]);
+            }else{
+
+                $validator = Validator::make($request->all(), [
+                    'title' => 'required|unique:review_videos|max:255',
+                    'url'=> 'required',
+                ]);
+            }
             if ($validator->fails()) {
                 $errors = $validator->errors();
                 $responseArray['status'] = false;
