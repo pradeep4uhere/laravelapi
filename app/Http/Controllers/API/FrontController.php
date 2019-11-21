@@ -31,6 +31,12 @@ class FrontController extends MasterController
 
     public $successStatus = 200;
 
+    public $resize = false;
+
+    function __construct() {
+        $this->resize = false; 
+    }
+
     public function testAPI(Request $request) {
         $array = ['apiTest'=>'OK'];
         return response()->json($array);
@@ -215,9 +221,10 @@ class FrontController extends MasterController
 
             //Get all Review List
             $reviewVideos = ReviewVideo::where('status','=',1)->limit(3)->get();
+            $allreviewVideos = ReviewVideo::where('status','=',1)->get();
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
-            $responseArray['data'] =array('setting'=>$settingArr,'review'=>$reviewVideos);
+            $responseArray['data'] =array('setting'=>$settingArr,'review'=>$reviewVideos,'allreview'=>$allreviewVideos);
             
         }catch (Exception $e) {
             $responseArray['status'] = false;
@@ -315,9 +322,20 @@ class FrontController extends MasterController
                 //print_r($settingArr[0]['destination_gallery']);die;
                 if(!empty($settingArr[0]['destination_gallery'])){
                         foreach($settingArr[0]['destination_gallery'] as $k=>$v){
-                             $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                             if($this->resize){
+                                 $url = env('APP_URL').'/storage/app/public/destination/resize/1139X627/'.$v['image'];
+                                 $url2 = env('APP_URL').'/storage/app/public/destination/resize/372X253/'.$v['image'];
+                                 $url3 = env('APP_URL').'/storage/app/public/destination/resize/75X68/'.$v['image'];
+                             }else{
+                                 $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                                 $url2 = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                                 $url3 = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
+                             }
+                             if($v['is_default']==1){
+                                 $settingArr[0]['destination_gallery'][0]=array('original'=>$url,'thumbnail'=>$url2,'icon'=>$url3);    
+                             }
+                                 $settingArr[0]['destination_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url2,'icon'=>$url3);
                             
-                             $settingArr[0]['destination_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url);
                         }     
                     }else{
                         $settingArr[0]['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';
@@ -330,13 +348,12 @@ class FrontController extends MasterController
                     
                     if(!empty($value['destination_gallery'])){
                         foreach($value['destination_gallery'] as $k=>$v){
+                            $url = env('APP_URL').'/storage/app/public/destination/resize/372X253/'.$v['image'];
+                            $url3 = env('APP_URL').'/storage/app/public/destination/resize/75X68/'.$v['image'];
                             if($v['is_default']==1){
-                                $url = env('APP_URL').'/storage/app/public/destination/'.$v['image'];
-                                $settingArr[$key]['destination_gallery'][0]=$url;
-                            }else{
-                                $url='';
-                                $settingArr[$key]['destination_gallery'][$k]=$url;
+                             $settingArr[$key]['destination_gallery'][0]=array('icon'=>$url3,'image'=>$url);
                             }
+                            $settingArr[$key]['destination_gallery'][$k]=array('icon'=>$url3,'image'=>$url);
                             
                         }    
                     }else{

@@ -289,12 +289,38 @@ class DestinationController extends MasterController
         $eventGallery = Destination::find($id);
         $eventGallery->banner = $imageName;
         if($eventGallery->save()){
-            return true;
+            $lastId= $eventGallery->id;
+            $this->resizeImage($lastId);
+            return $eventGallery->id;
         }else{
             return false;
         }
 
     }
+
+
+
+
+    private function resizeImage($id){
+        $imageArr = DestinationGallery::find($id);
+        $imageUrl = env('APP_URL').'/storage/app/public/destination/'.$imageArr['image'];
+        $resize = \Image::make($imageUrl);
+
+        // resize image to fixed size 75X68
+        $resize->resize(75,68)->save($imageArr['image']);
+        Storage::disk('destination/resize/75X68')->put($imageArr['image'], $resize);
+
+                
+        // resize image to fixed size 1139X627
+        $resize->resize(1139,627)->save($imageArr['image']);
+        Storage::disk('destination/resize/1139X627')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 372X253
+        $resize->resize(372,253)->save($imageArr['image']);
+        Storage::disk('destination/resize/372X253')->put($imageArr['image'], $resize);
+
+    }
+
 
 
     private function saveDestinationImage($id,$imageName){
@@ -306,6 +332,8 @@ class DestinationController extends MasterController
         $eventGallery['status'] = '1';
         $eventGallery['created_at'] = self::getCreatedDate();
         if($eventGallery->save()){
+            $lastId= $eventGallery->id;
+            $this->resizeImage($lastId);
             return true;
         }else{
             return false;

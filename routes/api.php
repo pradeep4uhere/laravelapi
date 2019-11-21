@@ -71,6 +71,7 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
 
     
     Route::any('getitinerary'           , 'API\ItineraryController@getitinerary');
+    Route::any('getitineraryday'        , 'API\ItineraryController@getItineraryDay');
     Route::any('additinerary'           , 'API\ItineraryController@addItinerary');
     Route::any('allitinerary'           , 'API\ItineraryController@allItinerary');
     Route::any('itineraryimageupload'   , 'API\ItineraryController@imageupload');
@@ -81,6 +82,7 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('itinerarydelete'        , 'API\ItineraryController@itineraryDelete');
     Route::any('itinerarydayslist'      , 'API\ItineraryController@itineraryDaysList');
     Route::any('additinerarydays'       , 'API\ItineraryController@addItineraryDays');
+    Route::any('updateitinerarydays'    , 'API\ItineraryController@updateItineraryDays');
     Route::any('deleteitineraryday'     , 'API\ItineraryController@deleteItineraryDays');
     Route::any('itinerarydayimageupload', 'API\ItineraryController@dayImageUpload');
     Route::any('itinerarydayimagedefault'  , 'API\ItineraryController@defaultdayImage');

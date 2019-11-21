@@ -90,6 +90,7 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+
         'itinerary' => [
             'driver' => 'local',
             'root' => storage_path('app/public/itinerary'),
@@ -105,6 +106,36 @@ return [
         'destination' => [
             'driver' => 'local',
             'root' => storage_path('app/public/destination'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'destination/resize' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/destination/resize'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'destination/resize/683X349' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/destination/resize/683X349'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'destination/resize/75X68' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/destination/resize/75X68'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'destination/resize/372X253' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/destination/resize/372X253'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'destination/resize/1139X627' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/destination/resize/1139X627'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
