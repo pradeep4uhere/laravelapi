@@ -34,7 +34,7 @@ class FrontController extends MasterController
     public $resize = false;
 
     function __construct() {
-        $this->resize = false; 
+        $this->resize = true; 
     }
 
     public function testAPI(Request $request) {
@@ -502,12 +502,17 @@ class FrontController extends MasterController
             
             $settingArr = BannerGallery::where('status','=',1)
                         ->where('banner_type_id','=',1)
-                        ->where('is_default','=',1)
                         ->get()
                         ->toArray();
+            foreach($settingArr as $k=>$v){
+                if($v['is_default']==1){
+                    $settingArr[0]=$v;
+                }
+                $settingArr[$k]=$v;
+            }
             //set All the Image Path 
             foreach($settingArr as $k=>$v){
-                $url = env('APP_URL').'/storage/app/public/banner/'.$v['image'];
+                $url = env('APP_URL').'/storage/app/public/banner/resize/2000X716/'.$v['image'];
                 $settingArr[$k]=$url;
             }
             $responseArray['status'] = true;

@@ -652,10 +652,21 @@ class GeneralController extends MasterController
         $eventGallery['status'] = '1';
         $eventGallery['created_at'] = self::getCreatedDate();
         if($eventGallery->save()){
-            return true;
+            $lastId= $eventGallery->id;
+            $this->resizeImage($lastId);
+            return $eventGallery->id;
         }else{
             return false;
         }
+    }
+
+    private function resizeImage($id){
+        $imageArr = BannerGallery::find($id);
+        $imageUrl = env('APP_URL').'/storage/app/public/banner/'.$imageArr['image'];
+        $resize = \Image::make($imageUrl);
+        // resize image to fixed size 75X68
+        $resize->resize(2000,716)->save($imageArr['image']);
+        Storage::disk('banner/resize/2000X716')->put($imageArr['image'], $resize);
     }
 
 
