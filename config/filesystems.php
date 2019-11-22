@@ -139,6 +139,42 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        'itinerary/resize/75X68' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itinerary/resize/75X68'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'itinerary/resize/372X253' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itinerary/resize/372X253'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'itinerary/resize/1139X627' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itinerary/resize/1139X627'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'itineraryday/resize/75X68' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itineraryday/resize/75X68'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'itineraryday/resize/128X96' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itineraryday/resize/128X96'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'itineraryday/resize/658X494' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/itineraryday/resize/658X494'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
         'banner' => [
             'driver' => 'local',
             'root' => storage_path('app/public/banner'),

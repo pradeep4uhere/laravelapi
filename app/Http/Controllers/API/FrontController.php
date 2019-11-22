@@ -395,8 +395,21 @@ class FrontController extends MasterController
                 //print_r($settingArr[0]['destination_gallery']);die;
                 if(!empty($settingArr[0]['itinerary_gallery'])){
                         foreach($settingArr[0]['itinerary_gallery'] as $k=>$v){
-                             $url = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
-                             $settingArr[0]['itinerary_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url);
+                            if($this->resize){
+                                $url = env('APP_URL').'/storage/app/public/itinerary/resize/1139X627/'.$v['image'];
+                                $url2 = env('APP_URL').'/storage/app/public/itinerary/resize/372X253/'.$v['image'];
+                                $url3 = env('APP_URL').'/storage/app/public/itinerary/resize/75X68/'.$v['image'];
+                            }else{
+                                $url = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
+                                $url2 = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
+                                $url3 = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
+                            }
+                            if($v['is_default']==1){
+                                $settingArr[0]['itinerary_gallery'][0]=array('original'=>$url,'thumbnail'=>$url2,'icon'=>$url3);    
+                            }
+                                $settingArr[0]['itinerary_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url2,'icon'=>$url3);
+                            //$url = env('APP_URL').'/storage/app/public/itinerary/'.$v['image'];
+                            //$settingArr[0]['itinerary_gallery'][$k]=array('original'=>$url,'thumbnail'=>$url);
                         }  
                          
                 }else{
@@ -406,11 +419,34 @@ class FrontController extends MasterController
                 foreach($settingArr[0]['itinerary_day'] as $kkk=>$daysItem){
                     if(!empty($daysItem['itinerary_day_gallery'])){
                         foreach($daysItem['itinerary_day_gallery'] as $kk=>$vv){
-                            $daysImageurl = env('APP_URL').'/storage/app/public/itineraryday/'.$vv['image'];
-                            $settingArr[0]['itinerary_day'][$kkk]['itinerary_day_gallery'][$kk]=array(
-                                'original'=>$daysImageurl,
-                                'thumbnail'=>$daysImageurl,
-                            );
+                            if($this->resize){
+                                $url = env('APP_URL').'/storage/app/public/itineraryday/resize/658X494/'.$vv['image'];
+                                $url2 = env('APP_URL').'/storage/app/public/itineraryday/resize/658X494/'.$vv['image'];
+                                $url3 = env('APP_URL').'/storage/app/public/itineraryday/resize/75X68/'.$vv['image'];
+                            }else{
+                                $url = env('APP_URL').'/storage/app/public/itineraryday/'.$vv['image'];
+                                $url2 = env('APP_URL').'/storage/app/public/itineraryday/'.$vv['image'];
+                                $url3 = env('APP_URL').'/storage/app/public/itineraryday/'.$vv['image'];
+                            }
+                            if($vv['is_default']==1){
+                                $settingArr[0]['itinerary_day'][$kkk]['itinerary_day_gallery'][0]=array('original'=>$url,'thumbnail'=>$url2,'icon'=>$url3);    
+                            }
+                            $settingArr[0]['itinerary_day'][$kkk]['itinerary_day_gallery'][$kk]=array('original'=>$url,'thumbnail'=>$url2,'icon'=>$url3);
+
+
+
+                            // $daysImageurl = env('APP_URL').'/storage/app/public/itineraryday/'.$vv['image'];
+
+                            // if($vv['is_default']==1){
+                            //     $settingArr[0]['itinerary_day'][$kkk]['itinerary_day_gallery'][0]=array(
+                            //         'original'=>$daysImageurl,
+                            //         'thumbnail'=>$daysImageurl,
+                            //     );
+                            // }
+                            // $settingArr[0]['itinerary_day'][$kkk]['itinerary_day_gallery'][$kk]=array(
+                            //     'original'=>$daysImageurl,
+                            //     'thumbnail'=>$daysImageurl,
+                            // );
                         }    
                     }else{
                         $settingArr['defaultImg']= env('APP_URL').'/storage/app/public/default/rudra.png';

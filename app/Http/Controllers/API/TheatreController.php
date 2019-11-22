@@ -118,6 +118,35 @@ class TheatreController extends MasterController
         return response()->json($responseArray, $this->successStatus); 
     }
 
+
+
+    public function deleteTheatreById(Request $request){
+        $responseArray = array();
+        if($request->method('post')){
+            $id  = $request->get('id');
+            $theatreDetails = Theatre::find($id);
+            if($theatreDetails->delete()){
+                $responseArray['status'] = 'success';
+                $responseArray['code']= "200";
+                $responseArray['message']= "Theatre deleted successfully."; 
+            }else{
+                $responseArray['status'] = 'errro';
+                $responseArray['code']= "500";
+                $responseArray['message']= "somthing went wrong, plz try after sometime"; 
+            }
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code'] = '500';
+            $responseArray['message'] = "No Theatre found";
+        }
+        return response()->json($responseArray, $this->successStatus); 
+    }
+
+
+
+
+    
+
     public function getTheatre(Request $request){
         $responseArray = array();
 

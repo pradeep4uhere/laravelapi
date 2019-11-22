@@ -92,11 +92,34 @@ class ItineraryController extends MasterController
         $eventGallery['status'] = '1';
         $eventGallery['created_at'] = self::getCreatedDate();
         if($eventGallery->save()){
+            $lastId= $eventGallery->id;
+            $this->resizeDayImage($lastId);
             return true;
         }else{
             return false;
         }
     }
+
+    private function resizeDayImage($id){
+        $imageArr = ItineraryDayGallery::find($id);
+        $imageUrl = env('APP_URL').'/storage/app/public/itineraryday/'.$imageArr['image'];
+        $resize = \Image::make($imageUrl);
+                
+        // resize image to fixed size 1139X627
+        $resize->resize(658,494)->save($imageArr['image']);
+        Storage::disk('itineraryday/resize/658X494')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 372X253
+        $resize->resize(128,96)->save($imageArr['image']);
+        Storage::disk('itineraryday/resize/128X96')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 75X68
+        $resize->resize(75,68)->save($imageArr['image']);
+        Storage::disk('itineraryday/resize/75X68')->put($imageArr['image'], $resize);
+
+
+    }
+
 
 
     public function addItinerary(Request $request){
@@ -833,9 +856,12 @@ class ItineraryController extends MasterController
                 "status"=>$item['status'],
             );
         }
+       $itineraryDetails = Itinerary::find($id);
        $responseArray['status'] = true;
        $responseArray['code']= "200";
        $responseArray['imagesList'] = $imgGalleryList;
+       $responseArray['details'] = $itineraryDetails;
+       
        return response()->json(['data' => $responseArray], $this->successStatus); 
     }
 
@@ -860,11 +886,36 @@ class ItineraryController extends MasterController
         $eventGallery['status'] = '1';
         $eventGallery['created_at'] = self::getCreatedDate();
         if($eventGallery->save()){
+            $lastId= $eventGallery->id;
+            $this->resizeImage($lastId);
             return true;
         }else{
             return false;
         }
     }
+
+
+
+    private function resizeImage($id){
+        $imageArr = ItineraryGallery::find($id);
+        $imageUrl = env('APP_URL').'/storage/app/public/itinerary/'.$imageArr['image'];
+        $resize = \Image::make($imageUrl);
+                
+        // resize image to fixed size 1139X627
+        $resize->resize(1139,627)->save($imageArr['image']);
+        Storage::disk('itinerary/resize/1139X627')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 372X253
+        $resize->resize(372,253)->save($imageArr['image']);
+        Storage::disk('itinerary/resize/372X253')->put($imageArr['image'], $resize);
+
+            // resize image to fixed size 75X68
+            $resize->resize(75,68)->save($imageArr['image']);
+            Storage::disk('itinerary/resize/75X68')->put($imageArr['image'], $resize);
+
+
+    }
+
 
 
 

@@ -228,6 +228,7 @@ class DestinationController extends MasterController
     //Upload Image Of the event
     public function imageupload(Request $request){
        $id= $request->get('id');
+       $destinationDetails = Destination::find($id);
        $responseArray = array();
        if($request->get('imageStr')){
         foreach($request->get('imageStr') as $file){
@@ -249,11 +250,13 @@ class DestinationController extends MasterController
                     $imageArr[]=array('status'=>true,'image'=>$file);
                 }
         }
+        
         if(count($imageArr)>0){
                 $responseArray['status'] = true;
                 $responseArray['code']= "200";
                 $responseArray['message']= "Image updated Successfully!!";
                 $responseArray['images']= $imageArr;
+                $responseArray['details']= $destinationDetails;
             }else{
                 $responseArray['status'] = false;
                 $responseArray['code']= "500";
@@ -282,6 +285,7 @@ class DestinationController extends MasterController
        $responseArray['status'] = true;
        $responseArray['code']= "200";
        $responseArray['imagesList'] = $imgGalleryList;
+       $responseArray['details']= $destinationDetails;
        return response()->json(['data' => $responseArray], $this->successStatus); 
     }
 
@@ -305,11 +309,6 @@ class DestinationController extends MasterController
         $imageArr = DestinationGallery::find($id);
         $imageUrl = env('APP_URL').'/storage/app/public/destination/'.$imageArr['image'];
         $resize = \Image::make($imageUrl);
-
-        // resize image to fixed size 75X68
-        $resize->resize(75,68)->save($imageArr['image']);
-        Storage::disk('destination/resize/75X68')->put($imageArr['image'], $resize);
-
                 
         // resize image to fixed size 1139X627
         $resize->resize(1139,627)->save($imageArr['image']);
@@ -318,6 +317,11 @@ class DestinationController extends MasterController
         // resize image to fixed size 372X253
         $resize->resize(372,253)->save($imageArr['image']);
         Storage::disk('destination/resize/372X253')->put($imageArr['image'], $resize);
+
+         // resize image to fixed size 75X68
+         $resize->resize(75,68)->save($imageArr['image']);
+         Storage::disk('destination/resize/75X68')->put($imageArr['image'], $resize);
+ 
 
     }
 

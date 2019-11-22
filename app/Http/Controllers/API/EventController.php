@@ -238,6 +238,14 @@ class EventController extends MasterController
 
     public function updateEventTiming(Request $request){
         $body = $request->get('body');
+        $priceArr = $body['price'];
+        if(empty($priceArr[0])){
+            $responseArray['status'] = 'error';
+            $responseArray['code']= "500";
+            $responseArray['message']= "Price is required"; 
+            return response()->json([$responseArray]); exit;
+        }
+
         $id = $request->get('id');
         if($id>0 || $id!=''){
             $eventDetails = EventTiming::find($id);
@@ -511,9 +519,12 @@ class EventController extends MasterController
                 "status"=>$item['status'],
             );
         }
+       $eventArr = Event::find($id);
        $responseArray['status'] = true;
        $responseArray['code']= "200";
        $responseArray['imagesList'] = $imgGalleryList;
+       $responseArray['eventArr']   = $eventArr;
+       
        return response()->json(['data' => $responseArray], $this->successStatus); 
     }
 

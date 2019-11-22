@@ -120,6 +120,8 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('updatetheatreseat'  , 'API\TheatreController@updateTheatreSeat');
     Route::any('gettheatreseat'     , 'API\TheatreController@getTheatreSeat');
     Route::any('gettheatrebyid'     , 'API\TheatreController@getTheatreById');
+    Route::any('deletetheatrebyid'  , 'API\TheatreController@deleteTheatreById');
+    
 
 
     //All Global Setting Type Here
