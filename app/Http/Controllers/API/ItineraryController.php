@@ -125,7 +125,7 @@ class ItineraryController extends MasterController
     public function addItinerary(Request $request){
         $responseArray = array();
         $data = $request->all();
-        if($data['id']!=''){
+        if($request->get('id')){
             $validator = Validator::make($request->all(), [
                 'title' => 'required|unique:itineraries,id|max:255',
                 'description'=> 'required',
@@ -152,19 +152,19 @@ class ItineraryController extends MasterController
             die;
         }else{
             $data = $request->all();
-            if($data['id']!=''){
+            if($request->get('id')){
                 $id = $data['id'];
             	$event = Itinerary::find($id);
             	$event->title = trim($data['title']);
 	            $event->description = trim($data['description']);
-	            $event->addon = $data['addon'];
+	            $event->trip_type = $data['addon'];
 	            $event->status = $data['status'];
 
             }else{
 	            $event = new Itinerary();
 	            $event->title = trim($data['title']);
 	            $event->description = trim($data['description']);
-	            $event->addon = $data['addon'];
+	            $event->trip_type = $data['addon'];
 	            $event->status = $data['status'];
 	            $event->created_at = self::getCreatedDate();
 	        }
@@ -297,6 +297,7 @@ class ItineraryController extends MasterController
             array('label'=>'Description','field'=>'description','sort'=>'asc','width'=>'100'),
             array('label'=>'AddOn','field'=>'addon','sort'=>'asc','width'=>'100'),
             array('label'=>'Image','field'=>'itinerary_gallery','sort'=>'asc','width'=>'100'),
+            array('label'=>'Trip Type','field'=>'trip_type','sort'=>'asc','width'=>'100'),
             array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),
             array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
             array('label'=>'Action','field'=>'action','sort'=>'asc','width'=>'100')
@@ -310,6 +311,7 @@ class ItineraryController extends MasterController
                 'description'=>substr(strip_tags($item['description']),0,20),
                 'addon'=>substr(strip_tags($item['addon']),0,20),
                 'itinerary_gallery'=>count($item['ItineraryGallery']),
+                'trip_type'=>($item['trip_type']!='')?$item['trip_type']:"--",
                 'status'=>$item['status'],
                 'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
                 'action'=>$actionStr
@@ -531,6 +533,8 @@ class ItineraryController extends MasterController
         $eventDetails['itinerary_id']   = $itinerary_id;
         $eventDetails['title']          = $request->get('title');
         $eventDetails['descriptions']   = $request->get('description');
+        $eventDetails['addon_description']   = $request->get('addon_descriptions');
+        $eventDetails['addon_includes']   = $request->get('addon_includes');
         $type = $request->get('type');
         if($type==1){
             $eventDetails['type']   = 1;

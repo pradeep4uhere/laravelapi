@@ -32,7 +32,7 @@ class EventController extends MasterController
             $columns = array(
                 array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
                 array('label'=>'Name','field'=>'title','sort'=>'asc','width'=>'170'),
-                array('label'=>'Durration','field'=>'durration','sort'=>'asc','width'=>'100'),
+                array('label'=>'Duration','field'=>'durration','sort'=>'asc','width'=>'100'),
               //  array('label'=>'Description','field'=>'description','sort'=>'asc','width'=>'100'),
                 array('label'=>'is_feature','field'=>'is_feature','sort'=>'asc','width'=>'100'),
                 array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),

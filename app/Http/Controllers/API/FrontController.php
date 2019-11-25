@@ -24,6 +24,7 @@ use App\ItineraryDayGallery;
 use App\ItineraryGallery;
 use App\City;
 use App\State;
+use DB;
 
 
 class FrontController extends MasterController
@@ -42,7 +43,151 @@ class FrontController extends MasterController
         return response()->json($array);
     }
 
+
+    public function getSearchResult(Request $request){
+        $globalArr = Setting::all();
+        $search = $request->get('search_text');
+        $searchResult = array();
+        //Search into All Destination 
+        $query = "select `rd_destinations`.* from `rd_destinations` ";
+        $query.= " where `rd_destinations`.`status` = 1";
+        $query.= ' and (`rd_destinations`.`title` like "%'.$search.'%"';
+        $query.= ' or `rd_destinations`.`more_information` like "%'.$search.'%"';
+        $query.= ' )';
+
+        $result = DB::select( DB::raw($query));
+        if(count($result)>0){
+            foreach($result as $item){
+                $searchResult[] = array(
+                        'title'=>$item->title,
+                        'desc'=>substr($item->descriptions,0,200),
+                        'url'=>'destinationdetails/'.$item->id,
+                );
+            }   
+        }
+
+        //Get All the Event List
+        
+        $query = "select `rd_events`.* from `rd_events` ";
+        $query.= " where `rd_events`.`status` = 1";
+        $query.= ' and (`rd_events`.`title` like "%'.$search.'%"';
+        $query.= ' or `rd_events`.`description` like "%'.$search.'%"';
+        $query.= ' or `rd_events`.`long_description` like "%'.$search.'%"';
+        $query.= ' )';
+        $result = DB::select( DB::raw($query));
+        if(count($result)>0){
+            foreach($result as $item){
+                $searchResult[] = array(
+                        'title'=>$item->title,
+                        'desc'=>substr($item->description,0,200),
+                        'url'=>'day-exp-detail/'.$this->getEventTimingId($item->id),
+                );
+            }   
+        }
+
+
+        //Get All the Viedo List
+        $query = "select `rd_review_videos`.* from `rd_review_videos` ";
+        $query.= " where `rd_review_videos`.`status` = 1";
+        $query.= ' and (`rd_review_videos`.`title` like "%'.$search.'%"';
+        $query.= ' or `rd_review_videos`.`url` like "%'.$search.'%"';
+        $query.= ' )';
+        $result = DB::select( DB::raw($query));
+        if(count($result)>0){
+            foreach($result as $item){
+                $searchResult[] = array(
+                        'title'=>$item->title,
+                        'desc'=>'',
+                        'url'=>'review/',
+                );
+            }   
+        }
+
+
+        //Get All the Itineraries List
+        
+        $query = "select `rd_itineraries`.* from `rd_itineraries` ";
+        $query.= " where `rd_itineraries`.`status` = 1";
+        $query.= ' and (`rd_itineraries`.`title` like "%'.$search.'%"';
+        $query.= ' or `rd_itineraries`.`description` like "%'.$search.'%"';
+        $query.= ' or `rd_itineraries`.`addon` like "%'.$search.'%"';
+        $query.= ' or `rd_itineraries`.`trip_type` like "%'.$search.'%"';
+        $query.= ' )';
+        $result = DB::select( DB::raw($query));
+        if(count($result)>0){
+            foreach($result as $item){
+                $searchResult[] = array(
+                        'title'=>$item->title,
+                        'desc'=>substr($item->description,0,200),
+                        'url'=>'destinationexpdetails/'.$item->id,
+                );
+            }   
+        }
+
+        //Get All the Itineraries List
+        
+        $query = "select `rd_itinerary_days`.* from `rd_itinerary_days` ";
+        $query.= " where `rd_itinerary_days`.`status` = 1";
+        $query.= ' and (`rd_itinerary_days`.`day` like "%'.$search.'%"';
+        $query.= ' or `rd_itinerary_days`.`place_name` like "%'.$search.'%"';
+        $query.= ' or `rd_itinerary_days`.`details` like "%'.$search.'%"';
+        $query.= ' )';
+        $result = DB::select( DB::raw($query));
+        if(count($result)>0){
+
+            foreach($result as $item){
+                $travelNmae = $this->getTravelName($item->itinerary_id);
+                $searchResult[] = array(
+                        'title'=>$travelNmae.'('.$item->day.')',
+                        'desc'=>substr($item->details,0,200),
+                        'url'=>'destinationexpdetails/'.$item->itinerary_id,
+                );
+            }   
+        }
+
+        //Get All the result from pages
+        
+        $query = "select `rd_pages`.* from `rd_pages` ";
+        $query.= " where `rd_pages`.`status` = 1";
+        $query.= ' and (`rd_pages`.`page_name` like "%'.$search.'%"';
+        $query.= ' or `rd_pages`.`title` like "%'.$search.'%"';
+        $query.= ' or `rd_pages`.`description` like "%'.$search.'%"';
+        $query.= ' )';
+        $result = DB::select( DB::raw($query));
+        if(count($result)>0){
+
+            foreach($result as $item){
+                $searchResult[] = array(
+                        'title'=>$item->title,
+                        'desc'=>substr($item->description,0,200),
+                        'url'=>'/'.$item->page_name,
+                );
+            }   
+        }
+         
+        $responseArray['status'] = true;
+        $responseArray['code'] = 200;
+        $responseArray['result'] = $searchResult;
+        return response()->json($responseArray);
+    }
     
+
+    private function getTravelName($id){
+        $res = Itinerary::find($id);
+        return $res['title'];
+
+    }
+
+    //Get Event Url Id from Event Id
+    private function getEventTimingId($id){
+        $event = Event::with('EventDetail')->where('id','=',$id)->get()->toArray();
+        if(count($event)>0){
+            if(!empty($event[0]['event_detail'][0]['event_timing'][0]['id'])){
+                $idStr= $id.'-'.$event[0]['event_detail'][0]['event_timing'][0]['id'];
+                return $idStr;
+            }
+        }
+    }
 
     public function getAllCity(Request $request){
         try{
@@ -510,11 +655,14 @@ class FrontController extends MasterController
 
             //Formate Event Array
             $eventFinalArr = array();
+            // echo "<pre>";
+            // print_r($eventFinalArr);
+            // die;
             foreach ($eventItem as $value) {
                 $eventFinalArr[]=array(
                     'event_id'=>$value['id'],
                     'id'=>$value['event_detail'][0]['event_timing'][0]['id'],
-                    'title'=>$value['event_detail'][0]['event_timing'][0]['theatre']['theater_name'],
+                    'title'=>$value['event_detail'][0]['event']['title'],
                     'place'=>$value['event_detail'][0]['city']['city_name'],
                     'price'=>$priceType.$value['event_detail'][0]['event_timing'][0]['price'][0]['price'],
                     'image'=>$this->getEventImage($value['event_gallery']),

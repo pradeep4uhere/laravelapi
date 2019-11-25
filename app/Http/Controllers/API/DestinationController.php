@@ -56,6 +56,7 @@ class DestinationController extends MasterController
                         array('label'=>'Population','field'=>'population','sort'=>'asc','width'=>'100'),
                         array('label'=>'Shopping','field'=>'shopping','sort'=>'asc','width'=>'100'),
                         array('label'=>'Cuisine','field'=>'cuisine','sort'=>'asc','width'=>'100'),
+                        array('label'=>'Trip Type','field'=>'trip_type','sort'=>'asc','width'=>'100'),
                         array('label'=>'Status','field'=>'status','sort'=>'asc','width'=>'100'),
                         array('label'=>'Created On','field'=>'created_at','sort'=>'asc','width'=>'100'),
                         array('label'=>'Action','field'=>'action','sort'=>'asc','width'=>'100')
@@ -72,6 +73,7 @@ class DestinationController extends MasterController
                             'population'=>($item['population']!='')?substr(strip_tags($item['population']),0,20):"--",
                             'shopping'=>($item['shopping']!='')?substr(strip_tags($item['shopping']),0,20):"--",
                             'cuisine'=>($item['cuisine']!='')?substr(strip_tags($item['cuisine']),0,20):"--",
+                            'trip_type'=>($item['trip_type']!='')?$item['trip_type']:"--",
                             'status'=>($item['status']!='')?$item['status']:"0",
                             'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
                             'action'=>$actionStr
