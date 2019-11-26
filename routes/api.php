@@ -151,6 +151,11 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('destinationimagedelete'   , 'API\DestinationController@deleteDestinationImage');
     Route::any('destinationimagedefault'  , 'API\DestinationController@defaultDestinationImage');
     Route::any('updatedestinationstatusimage'  , 'API\DestinationController@updateDestinationImageStatus');
+    Route::any('updatemembership'     , 'API\GeneralController@updatemembership')->name('updatemembership');
+    Route::any('deletemembership'     , 'API\GeneralController@deleteMembershipPlan')->name('deletemembership');
+    Route::any('updatemembershipprice'     , 'API\GeneralController@updateMembershipPrice')->name('updatemembershipprice');
+    
+    
 
 
 
@@ -190,6 +195,8 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('getallstate'          , 'API\FrontController@getAllState')->name('getallstate');
     Route::any('getallcity'           , 'API\FrontController@getAllCity')->name('getallcity');
     Route::any('searchresult'         , 'API\FrontController@getSearchResult')->name('searchresult');
+    
+    
     
     
     

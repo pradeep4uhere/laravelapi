@@ -433,12 +433,166 @@ class GeneralController extends MasterController
     }
 
 
+
+
+
+    
+    
+
+    /*
+     * @New Review Viedos API
+     * @createdOn : 11 June 2019
+     */
+    public function updateMembershipPrice(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id              = $request->get('id');
+            $name            = $request->get('name');
+            $monthly_price   = $request->get('monthly_price');
+            $quarterly_price = $request->get('quarterly_price');
+            $yearly_price    = $request->get('yearly_price');
+            $status               = $request->get('status');
+            if($id>0){
+                $pageList = MembershipPlan::find($id);
+            }else{
+                $pageList = new MembershipPlan();
+            }
+            $pageList->name             = $name;
+            $pageList->monthly_price    = $monthly_price;
+            $pageList->quarterly_price  = $quarterly_price;
+            $pageList->yearly_price     = $yearly_price;
+            $pageList->status           = $status;
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|max:255',
+                'monthly_price' => 'required|max:255',
+                'yearly_price' => 'required|max:255',
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $responseArray['status'] = false;
+                $errorStr ='';
+                if(!empty($errors)){
+                    foreach($errors->all() as $value){
+                        $errorStr.=$value;
+                    }
+                }
+                $responseArray['message']= "Input are not valid, ".$errorStr;
+    
+                $responseArray['error']= $errors;
+            }else{
+
+                if($pageList->save()){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['message'] = "Membership Plan updated.";
+                }else{
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
+            }
+            return response()->json($responseArray, $this->successStatus); 
+        }
+    }
+
+
+    /*
+     * @New Review Viedos API
+     * @createdOn : 11 June 2019
+     */
+    public function updatemembership(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id                   = $request->get('id');
+            $feature_title        = $request->get('feature_title');
+            $membership_plan_id   = $request->get('membership_plan_id');
+            $status               = $request->get('status');
+            if($id>0){
+                $pageList = MembershipFeature::find($id);
+            }else{
+                $pageList = new MembershipFeature();
+            }
+            $pageList->feature_title    = $feature_title;
+            $pageList->membership_plan_id    = $membership_plan_id;
+            $pageList->status   = $status;
+
+            $validator = Validator::make($request->all(), [
+                'feature_title' => 'required|max:255',
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $responseArray['status'] = false;
+                $errorStr ='';
+                if(!empty($errors)){
+                    foreach($errors->all() as $value){
+                        $errorStr.=$value;
+                    }
+                }
+                $responseArray['message']= "Input are not valid, ".$errorStr;
+    
+                $responseArray['error']= $errors;
+            }else{
+
+                if($pageList->save()){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['message'] = "Membership Feature updated.";
+                }else{
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
+            }
+            return response()->json($responseArray, $this->successStatus); 
+        }
+    }
+
+
+
+    /*
+     * @New Review Viedos API
+     * @createdOn : 11 June 2019
+     */
+    public function deleteMembershipPlan(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id         = $request->get('id');
+            if($id>0){
+                $pageList = MembershipFeature::find($id);
+                if($pageList->delete()){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['message'] = "Membership Feature deleted.";
+                }else{
+                    $responseArray['status'] = 'error';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+
+            }
+            return response()->json($responseArray, $this->successStatus); 
+        }
+    }
+
+
+
+
+
+
     /*
      * @Membership List API
      * @createdOn : 07 June 2019
      */
     public function getMembership(Request $request){
-        $membership = MembershipPlan::with('MembershipFeature')->get();
+        if($request->get('id')){
+            $membership = MembershipPlan::with('MembershipFeature')->find($request->get('id'));
+        }else{
+            $membership = MembershipPlan::with('MembershipFeature')->get();
+        }
         if(!empty($membership)){
             $responseArray['status'] = 'success';
             $responseArray['code'] = '200';

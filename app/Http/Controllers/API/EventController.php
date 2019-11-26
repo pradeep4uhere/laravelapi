@@ -25,13 +25,14 @@ class EventController extends MasterController
 
     public function getEventList(Request $request){
         $responseArray = array();
-        $eventList = Event::paginate(10000);
+        $eventList = Event::with('EventDetail')->paginate(10000);
         $links = $eventList->links();
 
         /****************Datatable Start***************/
             $columns = array(
                 array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
                 array('label'=>'Name','field'=>'title','sort'=>'asc','width'=>'170'),
+                array('label'=>'Language','field'=>'language','sort'=>'asc','width'=>'100'),
                 array('label'=>'Duration','field'=>'durration','sort'=>'asc','width'=>'100'),
               //  array('label'=>'Description','field'=>'description','sort'=>'asc','width'=>'100'),
                 array('label'=>'is_feature','field'=>'is_feature','sort'=>'asc','width'=>'100'),
@@ -41,11 +42,19 @@ class EventController extends MasterController
                 );
             $row = [];
             $actionStr ='';
+            $lang = '-NA-';
             foreach($eventList as $item){
+                if(!empty($item['EventDetail'][0])){
+                    if($item['EventDetail'][0]['language_id']==1){ $lang = 'Hindi';}
+                    if($item['EventDetail'][0]['language_id']==2){ $lang = 'English';}
+                }else{
+                    $lang = '-NA-';
+                }
+
                 $row[] =array(
                     'id'=>$item['id'],
                     'title'=>($item['title']!='')?$item['title']:"--",
-                   // 'description'=>($item['description']!='')?substr(strip_tags($item['description']),0,20):"--",
+                    'language'=>($lang!='')?$lang:"-NA-",
                     'durration'=>($item['durration']!='')?$item['durration']:"--",
                     'is_feature'=>($item['is_feature']!='')?$item['is_feature']:"0",
                     'status'=>($item['status']!='')?$item['status']:"0",
@@ -95,10 +104,19 @@ class EventController extends MasterController
             $event->status = $data['status'];
             $event->created_at = self::getCreatedDate();
             if($event->save()){
-                $responseArray['status'] = true;
-                $responseArray['code']= "200";
-                $responseArray['message']= "Event Added Successfully!!";
-                $responseArray['latest_id']= $event->id;
+                //Save Event Details For Latest Event Created
+                $last_id = $event->id;
+                if($this->createEventDetails($last_id)){
+                    $responseArray['status'] = true;
+                    $responseArray['code']= "200";
+                    $responseArray['message']= "Event Added Successfully!!";
+                    $responseArray['latest_id']= $event->id;
+                }else{
+                    $responseArray['status'] = false;
+                    $responseArray['code']= "500";
+                    $responseArray['message']= "Opps! Event not created, please try after Sometime.";
+                }
+                
             }else{
                 $responseArray['status'] = false;
                 $responseArray['code']= "500";
@@ -107,6 +125,21 @@ class EventController extends MasterController
         }
         return response()->json(['data' => $responseArray], $this->successStatus); 
 
+    }
+
+
+    private function createEventDetails($lastId){
+        $eventDetails = new EventDetail();
+        $eventDetails->event_id = $lastId;
+        $eventDetails->language_id = 1;
+        $eventDetails->country_id = 1;
+        $eventDetails->state_id = 1;
+        $eventDetails->city_id = 1;
+        if($eventDetails->save()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 

@@ -375,6 +375,15 @@ class ItineraryController extends MasterController
         $id = $request->get('id');
         $event = Itinerary::with('ItineraryDeparture','ItineraryAddon','ItineraryTermsAndConditions')->find($id);
         if(!empty($event)){
+          
+            foreach($event['ItineraryDeparture'] as $k=>$item){
+                if((strtotime($item['start_date'])<time()) && (strtotime($item['end_date'])<time())){
+                    $event['ItineraryDeparture'][$k]['expire']='1';
+                }else{
+                    $event['ItineraryDeparture'][$k]['expire']='0';
+                }
+
+            }
             $responseArray['status'] = true;
             $responseArray['code']= "200";
             $responseArray['data']= $event;
@@ -415,6 +424,18 @@ class ItineraryController extends MasterController
  			
             $id = $request->get('id');
             if($id!=''){
+                if(time()>strtotime($request->get('start_date'))){
+                    $responseArray['status'] = 'error';
+                    $responseArray['code']= "500";
+                    $responseArray['message']= "Start Date should be future date";
+                    return response()->json([$responseArray]);
+                }
+                if(strtotime($request->get('start_date')) > strtotime($request->get('end_date'))){
+                    $responseArray['status'] = 'error';
+                    $responseArray['code']= "500";
+                    $responseArray['message']= "End date should be greater than start date";
+                    return response()->json([$responseArray]);
+                }
             	$eventDetails = \App\ItineraryDeparture::find($id);
 	            if($eventDetails->count()){
 	                $eventDObj = ItineraryDeparture::find($id);
@@ -431,6 +452,19 @@ class ItineraryController extends MasterController
 	                }
 	            }
         	}else{
+                if(time()>strtotime($request->get('start_date'))){
+                    $responseArray['status'] = 'error';
+                    $responseArray['code']= "500";
+                    $responseArray['message']= "Start Date should be future date";
+                    return response()->json([$responseArray]);
+                }
+                if(strtotime($request->get('start_date')) > strtotime($request->get('end_date'))){
+                    $responseArray['status'] = 'error';
+                    $responseArray['code']= "500";
+                    $responseArray['message']= "End date should be greater than start date";
+                    return response()->json([$responseArray]);
+                }
+
         	    $eventDObj = new \App\ItineraryDeparture();
                 $eventDObj->itinerary_id 	= $request->get('itinerary_id');
                 $eventDObj->start_date 		= $request->get('start_date');
