@@ -239,12 +239,12 @@ class UserController extends MasterController
         $order_id = $request->get('order_id');
         $order_type = $request->get('order_type');
         if($order_id!=''){
-            $orderList = Order::with('OrderStatus','User','MembershipPlanOrder')->where('id','=',$order_id)->where('user_id','=',$user_id)->orderBy('id','DESC')->paginate(1000);
+            $orderList = Order::with('OrderStatus','User')->where('id','=',$order_id)->where('user_id','=',$user_id)->orderBy('id','DESC')->paginate(1000);
         }else{
             if($order_type!=''){
-                $orderList = Order::with('OrderStatus','User','MembershipPlanOrder')->where('order_type','=',$order_type)->where('user_id','=',$id)->orderBy('id','DESC')->paginate(1000);
+                $orderList = Order::with('OrderStatus','User')->where('order_type','=',$order_type)->where('user_id','=',$id)->orderBy('id','DESC')->paginate(1000);
             }else{
-                $orderList = Order::with('OrderStatus','User','MembershipPlanOrder')->where('user_id','=',$id)->orderBy('id','DESC')->paginate(10000);
+                $orderList = Order::with('OrderStatus','User')->where('user_id','=',$id)->orderBy('id','DESC')->paginate(10000);
             }
         }
 
