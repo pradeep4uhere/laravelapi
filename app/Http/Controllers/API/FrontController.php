@@ -43,6 +43,26 @@ class FrontController extends MasterController
         return response()->json($array);
     }
 
+    public function getGeneralPages(Request $request){
+        $optionsArr = $request->get('optionsArr');
+        $generalResultArr = array();
+        if(!empty($optionsArr)){
+            $pageList = Page::where('page_name','=',$optionsArr['page'])->where('status','=',1)->first();
+        }else{
+            $pageList = Page::where('status','=',1)->get();
+        }
+        if(!empty($pageList)){
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['page'] = $pageList;
+            $responseArray['setting'] = $this->getSetting();
+        }else{
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = "somthing went wrong, Please try after sometime.";
+        }
+        return response()->json($responseArray);    
+    }
     
 
     public function getMembershipList(Request $request){

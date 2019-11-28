@@ -197,6 +197,8 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('searchresult'         , 'API\FrontController@getSearchResult')->name('searchresult');
     Route::any('membershiplist'       , 'API\FrontController@getMembershipList')->name('membershiplist');
     Route::any('membershipbooking'    , 'API\OrderController@membershipBooking')->name('membershipbooking');
+    Route::any('getgeneralpages'      , 'API\FrontController@getGeneralPages')->name('getgeneralpages');
+    
     
 });
 

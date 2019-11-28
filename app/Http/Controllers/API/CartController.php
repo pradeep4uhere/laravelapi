@@ -254,7 +254,7 @@ class CartController extends MasterController
     public function getCartList(Request $request){
     	if(!empty($request->all())){
         	$userId 		=  $request->get('user_id');
-        	$cartItem = \Cart::session($userId)->getContent();
+			$cartItem = \Cart::session($userId)->getContent();
         	if(!empty($cartItem)){
         		// for a specific user
 				$total = \Cart::session($userId)->getTotal();
