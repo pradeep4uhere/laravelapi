@@ -18,12 +18,152 @@ use App\EventTiming;
 use App\EventSeat;
 use App\TempSeatBooking;
 use App\ItineraryBooking;
+use App\MembershipPlanOrder;
+use App\MembershipPlan;
 
 
 
 class OrderController extends MasterController
 {
 	
+	public function membershipBooking(Request $request){
+		//Check if this user email address is already present into DB
+		$id = $request->get('id');
+		$uid = $request->get('uid');
+		$type = $request->get('type');
+		$user = User::where('email','=',$request->get('email'))->get();
+	  if($user->count()){
+		  $userDetails = $user[0];
+	  }else{
+			$userDetails = User::find($uid);
+		}
+		
+		//Get Membership Details
+		$MembershipPlan = MembershipPlan::find($id);
+		if($type==1){
+			$totalamount = $MembershipPlan['monthly_price'];
+		}else if($type==2){
+			$totalamount = $MembershipPlan['quarterly_price'];
+		}else if($type==3){
+			$totalamount = $MembershipPlan['yearly_price'];
+		}else{
+			$totalamount = $MembershipPlan['monthly_price'];
+		}
+		
+		
+	  //Get All the Data into Foramte
+	  //$orderObj = new  Order();
+	  $orderData['user_id']		= $userDetails->id;	
+	  $orderData['orderID']			= time();
+	  $orderData['order_type']		= '3';
+	  $orderData['order_status_id']	= '1';
+	  $orderData['email_address']		= $request->get('email');
+	  $orderData['session']				= $request->get('user_id');
+	  $orderData['order_date']		= date('Y-m-d H:i:s');
+	  $orderData['ipaddress']			= $request->get('ip_address');
+	  $orderData['subtotal']			= $totalamount;;
+	  $orderData['total_amount']	= $totalamount;
+	  $orderData['is_offer_applied']	= '0';
+	  $orderData['offer_type']		= "";
+	  $orderData['offer_code']		= "";
+	  $orderData['offer_value']		= "0.00";
+	  $orderData['tax_amount']		= "0.00";
+	  $orderData['shipping_fname']	= $request->get('fname');
+	  $orderData['shipping_lname']	= $request->get('lname');
+	  $orderData['shipping_address1']	= $request->get('address1');
+	  $orderData['shipping_address2']	= $request->get('address2');
+	  $orderData['shipping_state']	= $request->get('city');
+	  $orderData['shipping_city']		= $request->get('state');
+	  $orderData['shipping_pincode']	= $request->get('pincode');
+	  $orderData['shipping_email']	= $request->get('email');
+	  $orderData['shipping_mobile']	= $request->get('mobile');
+	  $orderData['billing_fname']		= $request->get('bfname');
+	  $orderData['billing_lname']		= $request->get('bfname');
+	  $orderData['billing_address1']	= $request->get('baddress1');
+	  $orderData['billing_address2']	= $request->get('baddress2');
+	  $orderData['billing_state']		= $request->get('bcity');
+	  $orderData['billing_city']		= $request->get('bstate');
+	  $orderData['billing_pincode']	= $request->get('bpincode');
+	  $orderData['billing_email']		= $request->get('bemail');
+	  $orderData['billing_mobile']	= $request->get('user_id');
+	  $orderData['created_at']		= date("Y-m-d H:i:s");
+	  //print_r($orderData);die;
+
+	  //check is this Order is already present 
+	  //Create User For this Order is User is not registred with us
+	  
+	  
+	  $id = Order::create($orderData)->id;
+	  if($id>0){
+				//Save All Event Timing and Seats for this order
+				$orderArr = Order::find($id);
+			  if($this->saveMembershipPlanOrder($request,$id)){
+					$responseArray['message'] 	= "Membership Order Completed.";
+				}else{
+					$responseArray['message'] 	= "Membership Order recived. we will sent you confirmation as soon as possible";
+				}
+			  $responseArray['status']  	= true;
+			  $responseArray['code'] 	  	= 200;
+			  
+			  $responseArray['order'] 	= $orderArr;
+			  $responseArray['oid']       = encrypt($id);
+	  }else{
+			  $responseArray['status'] = false;
+			  $responseArray['code'] = 500;
+			  $responseArray['message'] ="Invalid Code.";
+		  }
+	  return response()->json($responseArray);
+  }
+
+
+	
+	//Save Membership Plan Order
+	private function saveMembershipPlanOrder($request,$id){
+		$type = $request->get('type');
+		//Get Membership Details
+		$MembershipPlan = MembershipPlan::find($request->get('id'));
+		if($type==1){
+			$typeStr = 'Monthly';
+			$paidAmount = $MembershipPlan['monthly_price'];
+		}else if($type==2){
+			$typeStr = 'Quaterly';
+			$paidAmount = $MembershipPlan['quarterly_price'];
+		}else if($type==3){
+			$typeStr = 'Yearly';
+			$paidAmount = $MembershipPlan['yearly_price'];
+		}else{
+			$typeStr = 'Monthly';
+			$paidAmount = $MembershipPlan['monthly_price'];
+		}
+
+
+		$memObj = array();
+		$memObj['user_id'] = $request->get('user_id');
+		$memObj['order_id'] = $id;
+		$memObj['membership_plan_id'] = $request->get('id');
+		$memObj['order_date'] = date("Y-m-d H:i:s");
+		$memObj['start_date'] = date("Y-m-d H:i:s");
+		$memObj['end_date'] = date("Y-m-d H:i:s",strtotime('+30 days',time()));
+		$memObj['plan_type'] = $typeStr;
+		$memObj['paid_amount'] = $paidAmount;
+		
+		$memObj['status'] = 1;
+		$memObj['created_at'] = date("Y-m-d H:i:s");
+		$mid = MembershipPlanOrder::create($memObj)->id;
+		//save Membership For User
+		if($mid>0){
+			$user = User::find($request->get('user_id'));
+			$user->membership_plan_order_id =$mid;
+			if($user->save()){
+					return true;
+			}
+		}else{
+			return false;
+		}
+}
+
+
+
 	public function prePaymentExpBooking(Request $request){
 		//Check if this user email address is already present into DB
 	  $user = User::where('email','=',$request->get('email'))->get();

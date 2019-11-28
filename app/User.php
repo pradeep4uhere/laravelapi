@@ -57,6 +57,12 @@ class User extends Authenticatable
         return $this->belongsTo(Country::class);
     }
 
+    public function MembershipPlanOrder() {
+        return $this->belongsTo(MembershipPlanOrder::class)->with('MembershipPlan');
+    }
+    
+
+
 
 
 

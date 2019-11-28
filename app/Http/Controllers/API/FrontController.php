@@ -43,6 +43,25 @@ class FrontController extends MasterController
         return response()->json($array);
     }
 
+    
+
+    public function getMembershipList(Request $request){
+        try{
+            
+            $MembershipPlan = MembershipPlan::with('MembershipFeature')->where('status','=',1)->get()->toArray();
+            //Get all Review List
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['membership'] = $MembershipPlan;
+            $responseArray['setting'] = $this->getSetting();
+            
+        }catch (Exception $e) {
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = $e->getMessage();
+        }
+        return response()->json($responseArray);
+    }
 
     public function getSearchResult(Request $request){
         $globalArr = Setting::all();

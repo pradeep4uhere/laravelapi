@@ -68,6 +68,10 @@ class Order extends Model
         return $this->hasMany(ItineraryBooking::class)->with('Itinerary','ItineraryDeparture');
     }
 
+    public function MembershipPlanOrder() {
+        return $this->hasMany(MembershipPlanOrder::class)->with('MembershipPlan');
+    }
+
     
 
 
