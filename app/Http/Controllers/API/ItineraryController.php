@@ -442,7 +442,8 @@ class ItineraryController extends MasterController
 	                $eventDObj->itinerary_id    = $request->get('itinerary_id');
 	                $eventDObj->start_date      = $request->get('start_date');
 	                $eventDObj->end_date        = $request->get('end_date');
-	                $eventDObj->price           = $request->get('price');
+                    $eventDObj->price           = $request->get('price');
+                    $eventDObj->price_in_doller = $request->get('price_in_doller');
 	                $eventDObj->status          = $request->get('status');
 	                if($eventDObj->save()){
 	                    $responseArray['status'] = true;
@@ -470,6 +471,7 @@ class ItineraryController extends MasterController
                 $eventDObj->start_date 		= $request->get('start_date');
                 $eventDObj->end_date 		= $request->get('end_date');
                 $eventDObj->price 			= $request->get('price');
+                $eventDObj->price_in_doller = $request->get('price_in_doller');
                 $eventDObj->status 			= $request->get('status');
                 $eventDObj->status 			= 1;
                 $eventDObj->created_at 		= self::getCreatedDate();
