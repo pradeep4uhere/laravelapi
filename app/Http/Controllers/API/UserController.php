@@ -620,6 +620,7 @@ class UserController extends MasterController
 
 
 
+
     public function userUpdateProfile(Request $request){
         $responseArray = array();
 

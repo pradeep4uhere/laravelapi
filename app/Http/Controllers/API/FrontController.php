@@ -199,7 +199,7 @@ class FrontController extends MasterController
                 $searchResult[] = array(
                         'title'=>$item->title,
                         'desc'=>substr($item->description,0,200),
-                        'url'=>'/'.$item->page_name,
+                        'url'=>$item->page_name,
                 );
             }   
         }
@@ -352,8 +352,15 @@ class FrontController extends MasterController
                     'image'=>$this->getEventImage($value['event_gallery']),
                 );
             }
-            
-            $chunk =array_chunk($eventFinalArr,4);
+            $itemCount = 1;
+            $itemCount		=  $request->get('itemCount');
+            $itemPerBox = 4;
+            if($itemCount>0){
+                $itemPerBox = $itemCount;
+            }else{
+                $itemPerBox = 4;
+            }
+            $chunk =array_chunk($eventFinalArr,$itemPerBox);
             $finalItem = array();
             foreach($chunk as $key=>$value){
                 $finalItem['item_'.$key] = $value;
