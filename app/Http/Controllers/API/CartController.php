@@ -253,7 +253,8 @@ class CartController extends MasterController
      */
     public function getCartList(Request $request){
     	if(!empty($request->all())){
-        	$userId 		=  $request->get('user_id');
+			$userId 		=  $request->get('user_id');
+			$cart =array();
 			$cartItem = \Cart::session($userId)->getContent();
         	if(!empty($cartItem)){
         		// for a specific user
@@ -334,6 +335,10 @@ class CartController extends MasterController
 						$responseArray['oid'] = encrypt($offerId);
 						$responseArray['offerValue'] = number_format($offerValue,2);
 					}
+				}else{
+					$responseArray['status'] = false;
+	        		$responseArray['code'] = 500;
+		        	$responseArray['message'] = "No Item into cart";
 				}
 
 

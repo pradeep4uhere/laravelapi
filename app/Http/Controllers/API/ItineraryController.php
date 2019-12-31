@@ -337,9 +337,30 @@ class ItineraryController extends MasterController
         $id = $request->get('id');
         $eventList = ItineraryDay::with('Itinerary','ItineraryDayGallery')->where('itinerary_id','=',$id)->paginate(10000);
         $links = $eventList->links();
+        $imgDaysGalleryList = array();
+        //formate all the Days Gallery
+        $i=0;
+        foreach($eventList as $item){
+            foreach($item['ItineraryDayGallery'] as $daysGalllery){
+                    $imgGalleryList[$i][] = array(
+                        "src"=>env('APP_URL').'/storage/app/public/itineraryday/'.$daysGalllery['image'],
+                        "thumbnail"=>env('APP_URL').'/storage/app/public/itineraryday/'.$daysGalllery['image'],
+                        "thumbnailWidth"=>rand(250,375),
+                        "thumbnailHeight"=>rand(175,250),
+                        "caption"=>"",
+                        "id"=>$daysGalllery['id'],
+                        "is_default"=>$daysGalllery['is_default'],
+                        "status"=>$daysGalllery['status'],
+                );
+            }
+            $i++;
+        }
+
         $responseArray['status'] = 'success';
         $responseArray['code'] = '200';
         $responseArray['event'] = $eventList;
+        $responseArray['imgGalleryList'] = $imgGalleryList;
+        
         return response()->json(['data' => $responseArray], $this->successStatus); 
     }
 
@@ -882,6 +903,7 @@ class ItineraryController extends MasterController
         }
 
         //Get Image List of this Event
+        //echo "Hello this is new"; die;
         $imageList = ItineraryGallery::where('itinerary_id','=',$id)->orderBy('id','DESC')->get();
         $imgGalleryList = array();
         foreach($imageList as $item){

@@ -30,7 +30,7 @@ class EventController extends MasterController
 
         /****************Datatable Start***************/
             $columns = array(
-                array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                array('label'=>'SN','field'=>'SN','sort'=>'asc','width'=>'25'),
                 array('label'=>'Name','field'=>'title','sort'=>'asc','width'=>'170'),
                 array('label'=>'Language','field'=>'language','sort'=>'asc','width'=>'100'),
                 array('label'=>'Duration','field'=>'durration','sort'=>'asc','width'=>'100'),
@@ -43,6 +43,8 @@ class EventController extends MasterController
             $row = [];
             $actionStr ='';
             $lang = '-NA-';
+            $i=1;
+
             foreach($eventList as $item){
                 if(!empty($item['EventDetail'][0])){
                     if($item['EventDetail'][0]['language_id']==1){ $lang = 'Hindi';}
@@ -50,8 +52,8 @@ class EventController extends MasterController
                 }else{
                     $lang = '-NA-';
                 }
-
                 $row[] =array(
+                    'SN'=>$i,
                     'id'=>$item['id'],
                     'title'=>($item['title']!='')?$item['title']:"--",
                     'language'=>($lang!='')?$lang:"-NA-",
@@ -61,6 +63,8 @@ class EventController extends MasterController
                     'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
                     'action'=>$actionStr
                 );
+                $i++;
+
             }
             $dataTable = array();
             $dataTable['columns'] =$columns;
@@ -101,7 +105,7 @@ class EventController extends MasterController
             $event->title = trim($data['title']);
             $event->description = trim($data['description']);
             $event->durration = $data['durration'];
-            $event->status = $data['status'];
+            $event->status = ($data['status']!='')?$data['status']:'1';
             $event->created_at = self::getCreatedDate();
             if($event->save()){
                 //Save Event Details For Latest Event Created
@@ -135,6 +139,7 @@ class EventController extends MasterController
         $eventDetails->country_id = 1;
         $eventDetails->state_id = 1;
         $eventDetails->city_id = 1;
+        $eventDetails->status = 1;
         if($eventDetails->save()){
             return true;
         }else{
@@ -255,7 +260,7 @@ class EventController extends MasterController
     public function getEventLocation(Request $request){
         $id = $request->get('event_id');
         if($id>0){
-            $eventDetails = \App\EventDetail::where('event_id','=',$id)->get();   
+            $eventDetails = \App\EventDetail::with('Event')->where('event_id','=',$id)->get();   
             $responseArray['status'] = true;
             $responseArray['code']= "200";
             $responseArray['data']= $eventDetails;   

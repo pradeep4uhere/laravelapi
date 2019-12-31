@@ -17,7 +17,7 @@ class TheatreController extends MasterController
 
     public function getTheatreList(Request $request){
         $responseArray = array();
-        $ListArr = Theatre::with('City')->paginate(10000);
+        $ListArr = Theatre::with('City','EventTiming')->paginate(10000);
         $links = $ListArr->links();
 
         /****************Datatable Start***************/

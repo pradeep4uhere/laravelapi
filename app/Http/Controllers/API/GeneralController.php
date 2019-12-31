@@ -66,7 +66,7 @@ class GeneralController extends MasterController
 
             /****************Datatable Start***************/
                 $columns = array(
-                    array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                    array('label'=>'SN','field'=>'SN','sort'=>'asc','width'=>'25'),
                     array('label'=>'orderID','field'=>'orderID','sort'=>'asc','width'=>'170'),
                     array('label'=>'Order Date','field'=>'order_date','sort'=>'asc','width'=>'100'),
                     array('label'=>'Name','field'=>'shipping_fname','sort'=>'asc','width'=>'100'),
@@ -79,8 +79,10 @@ class GeneralController extends MasterController
                     );
                 $row = [];
                 $actionStr ='';
+                $i=1;
                 foreach($order as $item){
                     $row[] =array(
+                        'SN'=>$i,
                         'id'=>$item['id'],
                         'orderID'=>($item['orderID']!='')?$item['orderID']:"--",
                         'order_date'=>date("d-M-Y",strtotime($item['order_date'])), 
@@ -92,6 +94,7 @@ class GeneralController extends MasterController
                         'order_status'=>(!empty($item['order_status']))?$item['order_status']['status_type']:"--",
                         'created_at'=>date("d-M-Y",strtotime($item['created_at']))
                     );
+                    $i++;
                 }
                 $dataTable = array();
                 $dataTable['columns'] =$columns;
@@ -153,7 +156,7 @@ class GeneralController extends MasterController
 
             /****************Datatable Start***************/
             $columns = array(
-                array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+                array('label'=>'SN','field'=>'SN','sort'=>'asc','width'=>'25'),
                 array('label'=>'orderID','field'=>'orderID','sort'=>'asc','width'=>'170'),
                 array('label'=>'Order Date','field'=>'order_date','sort'=>'asc','width'=>'100'),
                 array('label'=>'Name','field'=>'shipping_fname','sort'=>'asc','width'=>'100'),
@@ -166,8 +169,10 @@ class GeneralController extends MasterController
                 );
             $row = [];
             $actionStr ='';
+            $i=1;
             foreach($order as $item){
                 $row[] =array(
+                    'SN'=>$i,
                     'id'=>$item['id'],
                     'orderID'=>($item['orderID']!='')?$item['orderID']:"--",
                     'order_date'=>date("d-M-Y",strtotime($item['order_date'])), 
@@ -179,6 +184,7 @@ class GeneralController extends MasterController
                     'order_status'=>(!empty($item['order_status']))?$item['order_status']['status_type']:"--",
                     'created_at'=>date("d-M-Y",strtotime($item['created_at']))
                 );
+                $i++;
             }
             $dataTable = array();
             $dataTable['columns'] =$columns;

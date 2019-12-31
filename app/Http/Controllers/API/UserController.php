@@ -187,7 +187,7 @@ class UserController extends MasterController
 
         /****************Datatable Start***************/
         $columns = array(
-            array('label'=>'SN','field'=>'id','sort'=>'asc','width'=>'25'),
+            array('label'=>'SN','field'=>'SN','sort'=>'asc','width'=>'25'),
             array('label'=>'Name','field'=>'first_name','sort'=>'asc','width'=>'170'),
             array('label'=>'Username','field'=>'username','sort'=>'asc','width'=>'100'),
             array('label'=>'Email','field'=>'email','sort'=>'asc','width'=>'100'),
@@ -201,9 +201,11 @@ class UserController extends MasterController
             );
         $row = [];
         $actionStr ='';
+        $i=1;
         foreach($userList as $item){
             $date = new Carbon($item['created_at']->toDateTimeString());
             $row[] =array(
+                'SN'=>$i,
                 'id'=>$item['id'],
                 'first_name'=>($item['first_name']!='')?$item['first_name']:"--",
                 'username'=>($item['username']!='')?$item['username']:"--",
@@ -216,6 +218,7 @@ class UserController extends MasterController
                 'created_at'=>date("d-M-Y",strtotime($item['created_at']->toDateTimeString())),
                 'action'=>$actionStr
             );
+            $i++;
         }
         $dataTable = array();
         $dataTable['columns'] =$columns;

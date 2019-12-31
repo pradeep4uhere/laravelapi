@@ -25,6 +25,7 @@ use App\ItineraryGallery;
 use App\City;
 use App\State;
 use DB;
+use App\EventDetail;
 
 
 class FrontController extends MasterController
@@ -413,9 +414,26 @@ class FrontController extends MasterController
             //Get all Review List
             $reviewVideos = ReviewVideo::where('status','=',1)->limit(3)->get();
             $allreviewVideos = ReviewVideo::where('status','=',1)->get();
+            $eventArr = EventDetail::with('City')->get();
+            $place = array();
+            $temp = [];
+            foreach($eventArr as $item){
+                if(!array_key_exists($item['city']['city_name'],$temp)){
+                    $place[] = array('title'=>$item['city']['city_name']);
+                }
+                $temp[$item['city']['city_name']]=$item['city']['city_name'];
+                
+            }
+
+            //Get All the Place List
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
-            $responseArray['data'] =array('setting'=>$settingArr,'review'=>$reviewVideos,'allreview'=>$allreviewVideos);
+            $responseArray['data'] =array(
+                'setting'=>$settingArr,
+                'review'=>$reviewVideos,
+                'allreview'=>$allreviewVideos,
+                'place'=>$place
+            );
             
         }catch (Exception $e) {
             $responseArray['status'] = false;
