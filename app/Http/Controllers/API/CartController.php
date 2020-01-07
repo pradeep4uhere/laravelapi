@@ -268,6 +268,7 @@ class CartController extends MasterController
         				"price"=>number_format($item['price'],2),
         				"quantity"=>$item['quantity'],
         				"attributes"=>array(
+							"event_id"=>$item['attributes']['event_id'],
         					"seat_type_id"=>$item['attributes']['seat_type_id'],
         					"seating_type_name"=>$this->getSeatingTypeName($item['attributes']['seat_type_id']),
         					"event_timing_id"=>$item['attributes']['event_timing_id'],
@@ -582,6 +583,7 @@ class CartController extends MasterController
 	    	$seatArr = explode("|",$seat_id);	
 			\Cart::session($userId);
 			$attributes  = array(
+				"event_id"=>$eventDetails['event_id'],
 				"seat_type_id"=>$seatArr[0],
 				"event_timing_id"=>$event_timing_id,
 				"event_image"=>$eventImage,
@@ -641,6 +643,7 @@ class CartController extends MasterController
 	    	$seatArr = explode("|",$seat_id);	
 			\Cart::session($userId);
 			$attributes  = array(
+				"event_id"=>$eventDetails['event_id'],
 				"seat_type_id"=>$seatArr[0],
 				"event_timing_id"=>$event_timing_id,
 				"event_image"=>$eventImage,
