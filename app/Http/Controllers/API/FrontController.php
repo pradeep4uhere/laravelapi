@@ -759,13 +759,20 @@ class FrontController extends MasterController
                 $settingArr[$k]=$v;
             }
             //set All the Image Path 
+            $bannerArray = array();
             foreach($settingArr as $k=>$v){
-                $url = env('APP_URL').'/storage/app/public/banner/resize/2000X716/'.$v['image'];
+                $url2000716 = env('APP_URL').'/storage/app/public/banner/resize/2000X716/'.$v['image'];
+                $url414276 = env('APP_URL').'/storage/app/public/banner/resize/414X276/'.$v['image'];
+                $url375210 = env('APP_URL').'/storage/app/public/banner/resize/375X210/'.$v['image'];
+                $bannerArray[]=array('url2000716'=>$url2000716,'url414276'=>$url414276,'url375210'=>$url375210);
+
+                $url= env('APP_URL').'/storage/app/public/banner/resize/2000X716/'.$v['image'];
                 $settingArr[$k]=$url;
             }
             $responseArray['status'] = true;
             $responseArray['code'] = 200;
             $responseArray['data'] =$settingArr;
+            $responseArray['bannerArray'] =$bannerArray;
             $responseArray['setting'] =$globalArr;
             $responseArray['destinationList'] =$destinationList;
             $responseArray['eventFinalArr'] =$eventFinalArr;

@@ -187,7 +187,18 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
-
+        'banner/resize/414X276' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/banner/resize/414X276'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'banner/resize/375X210' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/banner/resize/375X210'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

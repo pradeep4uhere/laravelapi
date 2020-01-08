@@ -827,6 +827,15 @@ class GeneralController extends MasterController
         // resize image to fixed size 75X68
         $resize->resize(2000,716)->save($imageArr['image']);
         Storage::disk('banner/resize/2000X716')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 683X739
+        $resize->resize(414,276)->save($imageArr['image']);
+        Storage::disk('banner/resize/414X276')->put($imageArr['image'], $resize);
+
+        // resize image to fixed size 375X210
+        $resize->resize(375,210)->save($imageArr['image']);
+        Storage::disk('banner/resize/375X210')->put($imageArr['image'], $resize);
+ 
     }
 
 
