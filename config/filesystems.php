@@ -187,6 +187,12 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        'banner/resize/1024X576' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/banner/resize/1024X576'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
         'banner/resize/414X276' => [
             'driver' => 'local',
             'root' => storage_path('app/public/banner/resize/414X276'),

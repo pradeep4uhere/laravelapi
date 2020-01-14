@@ -23,14 +23,14 @@
     19 => 'Illuminate\\Translation\\TranslationServiceProvider',
     20 => 'Illuminate\\Validation\\ValidationServiceProvider',
     21 => 'Illuminate\\View\\ViewServiceProvider',
-    22 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    23 => 'Laravel\\Tinker\\TinkerServiceProvider',
-    24 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
-    25 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
+    22 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
+    23 => 'Darryldecode\\Cart\\CartServiceProvider',
+    24 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
+    25 => 'Intervention\\Image\\ImageServiceProvider',
     26 => 'Laravel\\Passport\\PassportServiceProvider',
-    27 => 'Carbon\\Laravel\\ServiceProvider',
-    28 => 'Darryldecode\\Cart\\CartServiceProvider',
-    29 => 'Intervention\\Image\\ImageServiceProvider',
+    27 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    28 => 'Carbon\\Laravel\\ServiceProvider',
+    29 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     30 => 'App\\Providers\\AppServiceProvider',
     31 => 'App\\Providers\\AuthServiceProvider',
     32 => 'App\\Providers\\EventServiceProvider',
@@ -51,11 +51,11 @@
     8 => 'Illuminate\\Session\\SessionServiceProvider',
     9 => 'Illuminate\\View\\ViewServiceProvider',
     10 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
-    11 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
-    12 => 'Laravel\\Passport\\PassportServiceProvider',
-    13 => 'Carbon\\Laravel\\ServiceProvider',
-    14 => 'Darryldecode\\Cart\\CartServiceProvider',
-    15 => 'Intervention\\Image\\ImageServiceProvider',
+    11 => 'Darryldecode\\Cart\\CartServiceProvider',
+    12 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
+    13 => 'Intervention\\Image\\ImageServiceProvider',
+    14 => 'Laravel\\Passport\\PassportServiceProvider',
+    15 => 'Carbon\\Laravel\\ServiceProvider',
     16 => 'App\\Providers\\AppServiceProvider',
     17 => 'App\\Providers\\AuthServiceProvider',
     18 => 'App\\Providers\\EventServiceProvider',
@@ -169,8 +169,8 @@
     'translation.loader' => 'Illuminate\\Translation\\TranslationServiceProvider',
     'validator' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'validation.presence' => 'Illuminate\\Validation\\ValidationServiceProvider',
-    'NunoMaduro\\Collision\\Contracts\\Provider' => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
+    'NunoMaduro\\Collision\\Contracts\\Provider' => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
   ),
   'when' => 
   array (
@@ -210,10 +210,10 @@
     'Illuminate\\Validation\\ValidationServiceProvider' => 
     array (
     ),
-    'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider' => 
+    'Laravel\\Tinker\\TinkerServiceProvider' => 
     array (
     ),
-    'Laravel\\Tinker\\TinkerServiceProvider' => 
+    'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider' => 
     array (
     ),
   ),

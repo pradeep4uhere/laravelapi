@@ -28,7 +28,7 @@ use App\ItineraryGallery;
 use App\ItineraryDeparture;
 class CartController extends MasterController
 {
-     
+
      private function getEventImage($event_gallery){
     	if(!empty($event_gallery)){
     		$count=1;
@@ -39,9 +39,9 @@ class CartController extends MasterController
     		}
     	}
 	}
-	
 
-	
+
+
 
 	public function updateExpItemFromCartList(Request $request){
     	if(!empty($request->all())){
@@ -65,7 +65,7 @@ class CartController extends MasterController
 	        	}else{
 	        		$responseArray['status'] = false;
 		        	$responseArray['code'] = 500;
-		        	$responseArray['message'] = "Somthing Went wrong, Please try after somtime";	
+		        	$responseArray['message'] = "Somthing Went wrong, Please try after somtime";
 	        	}
         	}else{
 				$responseArray['status'] = false;
@@ -80,7 +80,7 @@ class CartController extends MasterController
     	if(!empty($request->all())){
         		$userId		=  $request->get('user_id');
         		$itemId		=  $request->get('itemId');
-        		$quantity	=  $request->get('quantity'); 
+        		$quantity	=  $request->get('quantity');
 
         		// you may also want to update a product's quantity
         		$u = \Cart::session($userId)->update($itemId, array(
@@ -98,7 +98,7 @@ class CartController extends MasterController
 	        	}else{
 	        		$responseArray['status'] = false;
 		        	$responseArray['code'] = 500;
-		        	$responseArray['message'] = "Somthing Went wrong, Please try after somtime";	
+		        	$responseArray['message'] = "Somthing Went wrong, Please try after somtime";
 	        	}
         	}else{
 				$responseArray['status'] = false;
@@ -107,7 +107,7 @@ class CartController extends MasterController
 			}
 			return response()->json($responseArray);
 	}
-	
+
 
 
     /*
@@ -124,7 +124,7 @@ class CartController extends MasterController
 	        	}else{
 	        		$responseArray['status'] = false;
 		        	$responseArray['code'] = 500;
-		        	$responseArray['message'] = "Somthing Went wrong, Please try after somtime";	
+		        	$responseArray['message'] = "Somthing Went wrong, Please try after somtime";
 	        	}
         	}else{
 				$responseArray['status'] = false;
@@ -139,13 +139,13 @@ class CartController extends MasterController
 
 
 
-	
+
 
 	/*
      * Get Cart List
      */
     public function getExpCartList(Request $request){
-		
+
     	if(!empty($request->all())){
         	$userId 		=  $request->get('user_id');
 			$cartItem = \Cart::session($userId)->getContent();
@@ -169,9 +169,9 @@ class CartController extends MasterController
         			);
         		}
 
-        		
-				
-			
+
+
+
 		        $responseArray['status'] = true;
 	        	$responseArray['code'] = 200;
 	        	$responseArray['cart'] = $cart;
@@ -194,9 +194,9 @@ class CartController extends MasterController
 					//Check if this is from Checkout Page
 					$pos = strpos($offerId, "chk");
 					if($pos>0){
-						$offerStr = str_replace('?chk=','',$offerId); 
+						$offerStr = str_replace('?chk=','',$offerId);
 						try{
-						
+
 							$offerId = decrypt($offerStr);
 
 						}catch (DecryptException $e) {
@@ -261,7 +261,7 @@ class CartController extends MasterController
 				$total = \Cart::session($userId)->getTotal();
 				// for a specific user
 				$subTotal = \Cart::session($userId)->getSubTotal();
-				
+
         		foreach($cartItem as $item){
         			$cart[]=array(
         				"name"=>$item['name'],
@@ -279,7 +279,7 @@ class CartController extends MasterController
         			);
         		}
 
-        		
+
 
 		        $responseArray['status'] = true;
 	        	$responseArray['code'] = 200;
@@ -303,9 +303,9 @@ class CartController extends MasterController
 					//Check if this is from Checkout Page
 					$pos = strpos($offerId, "chk");
 					if($pos>0){
-						$offerStr = str_replace('?chk=','',$offerId); 
+						$offerStr = str_replace('?chk=','',$offerId);
 						try{
-						
+
 							$offerId = decrypt($offerStr);
 
 						}catch (DecryptException $e) {
@@ -355,7 +355,8 @@ class CartController extends MasterController
 
 
     private function getGst(){
-    	$tax = Tax::where('tax_type','=','GST')->first();
+        $tax['value'] = 0;
+    	$tax = Tax::where('tax_type','=','GST')->where('status','=','1')->first();
     	return $tax['value'];
     }
 
@@ -372,15 +373,15 @@ class CartController extends MasterController
         if(!empty($request->all())){
         	$userId 		=  $request->get('user_id');
         	$seat_id 		=  $request->get('seat_id');
-        	$bookingDate	=  $request->get('bookingDate');	
-        	$event_timing_id=  $request->get('id');	
+        	$bookingDate	=  $request->get('bookingDate');
+        	$event_timing_id=  $request->get('id');
         	if($bookingDate==''){
 	    		$responseArray['status'] = false;
 	        	$responseArray['code'] = 500;
 	        	$responseArray['message'] = "Date Of Booking Required.";
 	        	return $responseArray;
 	    	}
-        	$seatArr = explode("|",$seat_id);	
+        	$seatArr = explode("|",$seat_id);
 
         	//Check if this event timing into cart or not
         	$itmeId  = $event_timing_id.'-'.$seatArr[0];
@@ -398,13 +399,13 @@ class CartController extends MasterController
 
 
 	/*
-	* Add To Expericne into Cart 
+	* Add To Expericne into Cart
 	*/
 	public function addToExpCart(Request $request){
         if(!empty($request->all())){
         	$userId 		=  $request->get('user_id');
         	$dept_id 		=  $request->get('dept_id');
-        	$timing_id		=  $request->get('id');	
+        	$timing_id		=  $request->get('id');
         	if($dept_id==''){
 	    		$responseArray['status'] = false;
 	        	$responseArray['code'] = 500;
@@ -423,7 +424,7 @@ class CartController extends MasterController
         return response()->json($responseArray);
 
 	}
-	
+
 
 	 /*
      * Add Item to Cart
@@ -434,7 +435,7 @@ class CartController extends MasterController
     	if(!empty($request->all())){
 	    	$userId 		=  $request->get('user_id');
 	    	$dept_id 		=  $request->get('dept_id');
-			$itinerary_id=  $request->get('id');	
+			$itinerary_id=  $request->get('id');
 	    	//Get Details of Event Timing Detials Here
 			$itinerary = Itinerary::with('ValidItineraryDeparture','ItineraryGallery')->find($itinerary_id)->toArray();
 			$ItineraryDeparture = ItineraryDeparture::find($dept_id)->toArray();
@@ -473,12 +474,12 @@ class CartController extends MasterController
 	        	$responseArray['code'] = 500;
 	        	$responseArray['message'] = $e->getMessage();
 			}
-    	} 
+    	}
     	return $responseArray;
 	}
 
 
-	
+
 	private function getExpImage($event_gallery){
     	if(!empty($event_gallery)){
     		$count=1;
@@ -490,11 +491,11 @@ class CartController extends MasterController
     	}
     }
 
-	
 
 
 
-	
+
+
 	/*
      * Update Exp Item to Cart
      * @param $request
@@ -505,8 +506,8 @@ class CartController extends MasterController
     	{
 	    	$userId 		=  $request->get('user_id');
 	    	$seat_id 		=  $request->get('seat_id');
-	    	$bookingDate	=  $request->get('bookingDate');	
-	    	$event_timing_id=  $request->get('id');	
+	    	$bookingDate	=  $request->get('bookingDate');
+	    	$event_timing_id=  $request->get('id');
 
 	    	//Get Details of Event Timing Detials Here
 	    	$eventtiming = EventTiming::with('Theatre')->find($event_timing_id)->toArray();
@@ -514,13 +515,13 @@ class CartController extends MasterController
 	    	//Get Event Details
 	    	$eventDetails = EventDetail::where('id','=',$eventtiming['event_detail_id'])->first()->toArray();
 	    	$event = Event::with('EventDetail','EventGallery')->find($eventDetails['event_id'])->toArray();
-			
+
 	    	$theatrename = $eventtiming['theatre']['theater_name'];
 	    	$eventImage =  $this->getEventImage($event['event_gallery']);
 	    	$responseArray['message'] =$eventDetails;
 	        //return response()->json($responseArray);
 
-	    	$seatArr = explode("|",$seat_id);	
+	    	$seatArr = explode("|",$seat_id);
 			\Cart::session($userId);
 			$attributes  = array(
 				"seat_type_id"=>$seatArr[0],
@@ -553,7 +554,7 @@ class CartController extends MasterController
 		return $responseArray;
 
 	}
-	
+
 
     /*
      * Update Item to Cart
@@ -565,8 +566,8 @@ class CartController extends MasterController
     	{
 	    	$userId 		=  $request->get('user_id');
 	    	$seat_id 		=  $request->get('seat_id');
-	    	$bookingDate	=  $request->get('bookingDate');	
-	    	$event_timing_id=  $request->get('id');	
+	    	$bookingDate	=  $request->get('bookingDate');
+	    	$event_timing_id=  $request->get('id');
 
 	    	//Get Details of Event Timing Detials Here
 	    	$eventtiming = EventTiming::with('Theatre')->find($event_timing_id)->toArray();
@@ -574,13 +575,13 @@ class CartController extends MasterController
 	    	//Get Event Details
 	    	$eventDetails = EventDetail::where('id','=',$eventtiming['event_detail_id'])->first()->toArray();
 	    	$event = Event::with('EventDetail','EventGallery')->find($eventDetails['event_id'])->toArray();
-			
+
 	    	$theatrename = $eventtiming['theatre']['theater_name'];
 	    	$eventImage =  $this->getEventImage($event['event_gallery']);
 	    	$responseArray['message'] =$eventDetails;
 	        //return response()->json($responseArray);
 
-	    	$seatArr = explode("|",$seat_id);	
+	    	$seatArr = explode("|",$seat_id);
 			\Cart::session($userId);
 			$attributes  = array(
 				"event_id"=>$eventDetails['event_id'],
@@ -626,8 +627,8 @@ class CartController extends MasterController
     	if(!empty($request->all())){
 	    	$userId 		=  $request->get('user_id');
 	    	$seat_id 		=  $request->get('seat_id');
-	    	$bookingDate	=  $request->get('bookingDate');	
-	    	$event_timing_id=  $request->get('id');	
+	    	$bookingDate	=  $request->get('bookingDate');
+	    	$event_timing_id=  $request->get('id');
 	    	//Get Details of Event Timing Detials Here
 	    	$eventtiming = EventTiming::with('Theatre')->find($event_timing_id)->toArray();
 
@@ -640,7 +641,7 @@ class CartController extends MasterController
 	    	$responseArray['message'] =$eventDetails;
 	        //return response()->json($responseArray);
 
-	    	$seatArr = explode("|",$seat_id);	
+	    	$seatArr = explode("|",$seat_id);
 			\Cart::session($userId);
 			$attributes  = array(
 				"event_id"=>$eventDetails['event_id'],
@@ -672,7 +673,7 @@ class CartController extends MasterController
 	        	$responseArray['code'] = 500;
 	        	$responseArray['message'] = $e->getMessage();
 			}
-    	} 
+    	}
     	return $responseArray;
 	}
 
@@ -687,7 +688,7 @@ class CartController extends MasterController
     	if(!empty($request->all())){
 	    	$userId 		=  $request->get('user_id');
 	    	$code 			=  trim($request->get('code'));
-	    	
+
 	    	$offer = Offer::where('offer_code','=',$code)->first();
 	    	if(!empty($offer)){
 
@@ -723,14 +724,14 @@ class CartController extends MasterController
 	    	        	'type'=>$offer['offer_type'],
 	    	        	'value'=>$offer['offer_value'],
 	    	        	'subtotal'=>$newtotal,
-	    	        	'offerValue'=>number_format($offerValue,2));	
+	    	        	'offerValue'=>number_format($offerValue,2));
 	    		}else{
 	    			$responseArray['status'] = false;
 			        $responseArray['code'] = 500;
 		            $responseArray['message'] ="Coupon Code is expired.";
 	    		}
 
-	    		
+
         	}else{
         		$responseArray['status'] = false;
 		        $responseArray['code'] = 500;

@@ -20,6 +20,7 @@ use Storage;
 use App\BannerGallery;
 use App\Setting;
 use App\Itinerary;
+use App\Tax;
 
 class GeneralController extends MasterController
 {
@@ -51,7 +52,7 @@ class GeneralController extends MasterController
     }
 
 
-    
+
     /*
      *@Get All Dashboard Data
      */
@@ -85,7 +86,7 @@ class GeneralController extends MasterController
                         'SN'=>$i,
                         'id'=>$item['id'],
                         'orderID'=>($item['orderID']!='')?$item['orderID']:"--",
-                        'order_date'=>date("d-M-Y",strtotime($item['order_date'])), 
+                        'order_date'=>date("d-M-Y",strtotime($item['order_date'])),
                         'shipping_fname'=>($item['shipping_fname']!='')?$item['shipping_fname'].' '.$item['shipping_lname']:"--",
                         'shipping_email'=>($item['shipping_email']!='')?$item['shipping_email']:"--",
                         'shipping_mobile'=>($item['shipping_mobile']!='')?$item['shipping_mobile']:"--",
@@ -101,12 +102,12 @@ class GeneralController extends MasterController
                 $dataTable['rows'] =$row;
                 $responseArray['order']['dataTable']=$dataTable;
             /****************Datatable Ends now***************/
-            
+
             $responseArray['status'] = 'success';
             $responseArray['code'] = '200';
-            
+
         }
-        return response()->json($responseArray, $this->successStatus); 
+        return response()->json($responseArray, $this->successStatus);
     }
 
 
@@ -130,19 +131,19 @@ class GeneralController extends MasterController
             $ecancel=0;
             $eppending=0;
             foreach($order as $item){
-                if($item['order_status_id']==1){ 
+                if($item['order_status_id']==1){
                     $esuccess++;
                     $etravelOrderChart["paymentSccuess"]=$esuccess;
-                }else if($item['order_status_id']==5){ 
+                }else if($item['order_status_id']==5){
                     $efailed++;
                     $etravelOrderChart['failed']=$efailed;
-                }else if($item['order_status_id']==3){ 
+                }else if($item['order_status_id']==3){
                     $ehold++;
                     $etravelOrderChart["onHold"]=$ehold;
-                }else if($item['order_status_id']==4){ 
+                }else if($item['order_status_id']==4){
                     $eppending++;
                     $etravelOrderChart["paymentPending"]=$eppending;
-                }else if($item['order_status_id']==6){ 
+                }else if($item['order_status_id']==6){
                     $ecancel++;
                     $etravelOrderChart["cancel"]=$ecancel;
                 }else{
@@ -175,7 +176,7 @@ class GeneralController extends MasterController
                     'SN'=>$i,
                     'id'=>$item['id'],
                     'orderID'=>($item['orderID']!='')?$item['orderID']:"--",
-                    'order_date'=>date("d-M-Y",strtotime($item['order_date'])), 
+                    'order_date'=>date("d-M-Y",strtotime($item['order_date'])),
                     'shipping_fname'=>($item['shipping_fname']!='')?$item['shipping_fname'].' '.$item['shipping_lname']:"--",
                     'shipping_email'=>($item['shipping_email']!='')?$item['shipping_email']:"--",
                     'shipping_mobile'=>($item['shipping_mobile']!='')?$item['shipping_mobile']:"--",
@@ -241,19 +242,19 @@ class GeneralController extends MasterController
             $ppending=0;
             $travelOrder = Order::with('OrderStatus')->where("order_type",'=',2)->get()->toArray();
             foreach($travelOrder as $item){
-                if($item['order_status_id']==1){ 
+                if($item['order_status_id']==1){
                     $success++;
                     $travelOrderChart["paymentSccuess"]=$success;
-                }else if($item['order_status_id']==5){ 
+                }else if($item['order_status_id']==5){
                     $failed++;
                     $travelOrderChart['failed']=$failed;
-                }else if($item['order_status_id']==3){ 
+                }else if($item['order_status_id']==3){
                     $hold++;
                     $travelOrderChart["onHold"]=$hold;
-                }else if($item['order_status_id']==4){ 
+                }else if($item['order_status_id']==4){
                     $ppending++;
                     $travelOrderChart["paymentPending"]=$ppending;
-                }else if($item['order_status_id']==6){ 
+                }else if($item['order_status_id']==6){
                     $cancel++;
                     $travelOrderChart["cancel"]=$cancel;
                 }else{
@@ -268,7 +269,7 @@ class GeneralController extends MasterController
             $responseArray['order']['TravelOrder'] = count($travelOrder);
             $responseArray['order']['travelOrderChart'] = $travelOrderChart;
             $responseArray['order']['etravelOrderChart'] = $etravelOrderChart;
-            
+
             $responseArray['order']['TravelOrderAmount'] =number_format(array_sum($travelOrderAmount),2);
             $responseArray['order']['UsersList'] = $users;
             $responseArray['order']['TotalAmount'] = number_format($total[0]->total,2);
@@ -278,9 +279,9 @@ class GeneralController extends MasterController
 
             $responseArray['status'] = 'success';
             $responseArray['code'] = '200';
-            
+
         }
-        return response()->json($responseArray, $this->successStatus); 
+        return response()->json($responseArray, $this->successStatus);
     }
 
 
@@ -308,13 +309,107 @@ class GeneralController extends MasterController
             $responseArray['message'] = 'Invalid Requets';
 
         }
-        return response()->json($responseArray, $this->successStatus); 
+        return response()->json($responseArray, $this->successStatus);
     }
 
 
 
 
-    public function getseattinglist(Request $request){
+     public function getTaxList(Request $request){
+           if($request->isMethod('post'))
+           {
+               if($request->get('id')>0){
+                   $id = $request->get('id');
+                   $sittingType = Tax::find($id);
+               }else{
+                   $sittingType = Tax::get();
+               }
+               $responseArray['status'] = 'success';
+               $responseArray['code'] = '200';
+               $responseArray['taxList'] = $sittingType;
+           }else{
+               $responseArray['status'] = 'error';
+               $responseArray['code'] = '500';
+               $responseArray['message'] = 'Invalid Requets';
+
+           }
+           return response()->json($responseArray, $this->successStatus);
+
+       }
+
+
+
+
+    public function getTaxListUpdate(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id = $request->get('id');
+            if($id>0){
+                $sittingType = Tax::find($id);
+                $sittingType->tax_type = $request->get('tax_type');
+                $sittingType->value = $request->get('value');
+                $sittingType->status = $request->get('status');
+            }else{
+                $sittingType = new Tax();
+                $sittingType['tax_type'] = $request->get('tax_type');
+                $sittingType['value'] = $request->get('value');
+                $sittingType['status'] = $request->get('status');
+                $sittingType['created_at'] = self::getCreatedDate();
+            }
+            if($sittingType->save()){
+                $responseArray['status'] = 'success';
+                $responseArray['code'] = '200';
+                $responseArray['message'] = 'Tax Type Updated Successfully.';
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+            }
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code'] = '500';
+            $responseArray['message'] = 'Invalid Requets';
+
+        }
+        return response()->json($responseArray, $this->successStatus);
+    }
+
+
+
+
+  /*
+     * @New Review Viedos API
+     * @createdOn : 11 June 2019
+     */
+    public function getTaxListDelete(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id         = $request->get('id');
+            if($id>0){
+                $pageList = Tax::find($id);
+                if($pageList->delete()){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['message'] = "Tax Type deleted.";
+                }else{
+                    $responseArray['status'] = 'error';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+
+            }
+            return response()->json($responseArray, $this->successStatus);
+        }
+    }
+
+
+
+
+     public function getseattinglist(Request $request){
         if($request->isMethod('post'))
         {
             if($request->get('id')>0){
@@ -332,7 +427,7 @@ class GeneralController extends MasterController
             $responseArray['message'] = 'Invalid Requets';
 
         }
-        return response()->json($responseArray, $this->successStatus); 
+        return response()->json($responseArray, $this->successStatus);
 
     }
 
@@ -361,7 +456,7 @@ class GeneralController extends MasterController
             $responseArray['message'] = 'Invalid Requets';
 
         }
-        return response()->json($responseArray, $this->successStatus); 
+        return response()->json($responseArray, $this->successStatus);
     }
 
 
@@ -380,7 +475,7 @@ class GeneralController extends MasterController
                 $responseArray['code'] = '500';
                 $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
     }
 
 
@@ -399,7 +494,7 @@ class GeneralController extends MasterController
                 $responseArray['code'] = '500';
                 $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
 
     }
 
@@ -434,7 +529,7 @@ class GeneralController extends MasterController
                 $responseArray['code'] = '500';
                 $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
@@ -442,8 +537,8 @@ class GeneralController extends MasterController
 
 
 
-    
-    
+
+
 
     /*
      * @New Review Viedos API
@@ -483,7 +578,7 @@ class GeneralController extends MasterController
                     }
                 }
                 $responseArray['message']= "Input are not valid, ".$errorStr;
-    
+
                 $responseArray['error']= $errors;
             }else{
 
@@ -497,7 +592,7 @@ class GeneralController extends MasterController
                     $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
                 }
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
@@ -535,7 +630,7 @@ class GeneralController extends MasterController
                     }
                 }
                 $responseArray['message']= "Input are not valid, ".$errorStr;
-    
+
                 $responseArray['error']= $errors;
             }else{
 
@@ -549,7 +644,7 @@ class GeneralController extends MasterController
                     $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
                 }
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
@@ -580,7 +675,7 @@ class GeneralController extends MasterController
                 $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
 
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
@@ -660,7 +755,7 @@ class GeneralController extends MasterController
                     }
                 }
                 $responseArray['message']= "Input are not valid, ".$errorStr;
-    
+
                 $responseArray['error']= $errors;
             }else{
 
@@ -674,7 +769,7 @@ class GeneralController extends MasterController
                     $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
                 }
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
@@ -702,12 +797,12 @@ class GeneralController extends MasterController
                 $responseArray['code'] = '500';
                 $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
 
-    
+
 
      /*
      * @New Review Viedos API
@@ -734,14 +829,14 @@ class GeneralController extends MasterController
                 $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
 
             }
-            return response()->json($responseArray, $this->successStatus); 
+            return response()->json($responseArray, $this->successStatus);
         }
     }
 
 
 
 
-    
+
     //Upload Image Of the event
     public function imageupload(Request $request){
        $id= $request->get('id');
@@ -753,7 +848,7 @@ class GeneralController extends MasterController
                 $datas = base64_decode($data);
                 $typeArr = explode('/', $type);
                 $file = md5(uniqid()) . '.'.end($typeArr);
-               
+
                 Storage::disk('banner')->put($file, base64_decode($data));
                 if($this->saveBannerImage($id,$file)){
                     /*
@@ -776,9 +871,9 @@ class GeneralController extends MasterController
                 $responseArray['status'] = false;
                 $responseArray['code']= "500";
                 $responseArray['message']= "Opps! Somthing went wrong";
-                return response()->json(['data' => $responseArray], $this->successStatus); 
+                return response()->json(['data' => $responseArray], $this->successStatus);
             }
-            
+
         }
 
         //Get Image List of this Event
@@ -799,7 +894,7 @@ class GeneralController extends MasterController
        $responseArray['status'] = true;
        $responseArray['code']= "200";
        $responseArray['imagesList'] = $imgGalleryList;
-       return response()->json(['data' => $responseArray], $this->successStatus); 
+       return response()->json(['data' => $responseArray], $this->successStatus);
     }
 
 
@@ -828,6 +923,9 @@ class GeneralController extends MasterController
         $resize->resize(2000,716)->save($imageArr['image']);
         Storage::disk('banner/resize/2000X716')->put($imageArr['image'], $resize);
 
+        $resize->resize(1024,576)->save($imageArr['image']);
+        Storage::disk('banner/resize/1024X576')->put($imageArr['image'], $resize);
+
         // resize image to fixed size 683X739
         $resize->resize(414,276)->save($imageArr['image']);
         Storage::disk('banner/resize/414X276')->put($imageArr['image'], $resize);
@@ -835,13 +933,13 @@ class GeneralController extends MasterController
         // resize image to fixed size 375X210
         $resize->resize(375,210)->save($imageArr['image']);
         Storage::disk('banner/resize/375X210')->put($imageArr['image'], $resize);
- 
+
     }
 
 
 
 
-    
+
 
   public function deleteBannerImage(Request $request){
          $id = $request->get('id');
@@ -855,13 +953,13 @@ class GeneralController extends MasterController
              $responseArray['code']= "500";
              $responseArray['message']= "Image not deleted !!";
          }
-         return response()->json(['data' => $responseArray], $this->successStatus); 
+         return response()->json(['data' => $responseArray], $this->successStatus);
   }
 
 
 
     public function defaultBannerImage(Request $request){
-    
+
          $id = $request->get('id');
          $eventImage = BannerGallery::find($id);
          DB::table('banner_galleries')->update(['is_default' => 0]);
@@ -879,17 +977,17 @@ class GeneralController extends MasterController
              $responseArray['code']= "500";
              $responseArray['message']= "Image not set as default !!";
          }
-         return response()->json(['data' => $responseArray], $this->successStatus); 
-    
+         return response()->json(['data' => $responseArray], $this->successStatus);
+
     }
 
 
 
 
-    
+
 
     public function updateBannerImageStatus(Request $request){
-    
+
          $id = $request->get('id');
          $eventImage = BannerGallery::find($id);
          if($eventImage->status==0){
@@ -908,8 +1006,8 @@ class GeneralController extends MasterController
              $responseArray['code']= "500";
              $responseArray['message']= "Image status not updated !!";
          }
-         return response()->json(['data' => $responseArray], $this->successStatus); 
-    
+         return response()->json(['data' => $responseArray], $this->successStatus);
+
     }
 
 

@@ -762,9 +762,15 @@ class FrontController extends MasterController
             $bannerArray = array();
             foreach($settingArr as $k=>$v){
                 $url2000716 = env('APP_URL').'/storage/app/public/banner/resize/2000X716/'.$v['image'];
+                $url1024576 = env('APP_URL').'/storage/app/public/banner/resize/1024X576/'.$v['image'];
                 $url414276 = env('APP_URL').'/storage/app/public/banner/resize/414X276/'.$v['image'];
                 $url375210 = env('APP_URL').'/storage/app/public/banner/resize/375X210/'.$v['image'];
-                $bannerArray[]=array('url2000716'=>$url2000716,'url414276'=>$url414276,'url375210'=>$url375210);
+                $bannerArray[]=array(
+                    'url2000716'=>$url2000716,
+                    'url1024576'=>$url1024576,
+                    'url414276'=>$url414276,
+                    'url375210'=>$url375210
+                );
 
                 $url= env('APP_URL').'/storage/app/public/banner/resize/2000X716/'.$v['image'];
                 $settingArr[$k]=$url;

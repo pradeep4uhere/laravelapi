@@ -26,10 +26,10 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['cors']],function () {
     Route::any('settingupdate'      , 'API\ApiController@settingUpdate')->name('settingupdate');
     Route::any('addtocart'          , 'API\CartController@addToCart')->name('addtocart');
     Route::any('addtoexpcart'       , 'API\CartController@addtoExpCart')->name('addtoexpcart');
-    
 
 
-    
+
+
 });
 
 //Auth API
@@ -37,7 +37,7 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
 
     Route::any('getalldashboard'    , 'API\GeneralController@getAllDashobardList');
     Route::any('getalltravellorderlist'    , 'API\GeneralController@getAllTravellOrderList');
-    
+
 
 	Route::any('testauth'           , 'API\GeneralController@testAPI');
     Route::get('details'            , 'API\UserController@details');
@@ -46,15 +46,15 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('usereventorderlist' , 'API\UserController@userEventOrderList');
     Route::any('usereventorderdetails' , 'API\UserController@userEventOrderDetails');
     Route::any('usertravelorderdetails' , 'API\UserController@userTravelOrderDetails');
-    
 
 
-    
+
+
     //All Event Realted API Start Hrer
     Route::any('geteventlist'       , 'API\EventController@getEventList');
     Route::any('addevent'           , 'API\EventController@addEvent');
     Route::any('updateevent'        , 'API\EventController@updateEvent');
-    
+
 
     Route::any('geteventdetails'    , 'API\EventController@getEventDetails');
     Route::any('eventgetbanner'     , 'API\EventController@getEventBanner');
@@ -69,7 +69,7 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('updateeventstatusfeatureimage'  , 'API\EventController@updateEventFeatureImageStatus');
     Route::any('deleteevent'        , 'API\EventController@deleteEvent');
 
-    
+
     Route::any('getitinerary'           , 'API\ItineraryController@getitinerary');
     Route::any('getitineraryday'        , 'API\ItineraryController@getItineraryDay');
     Route::any('additinerary'           , 'API\ItineraryController@addItinerary');
@@ -89,10 +89,10 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('itinerarydayimagedelete'   , 'API\ItineraryController@deletedayImage');
     Route::any('itineraryaddondelete'     , 'API\ItineraryController@itineraryAddonDelete');
     Route::any('updateitineraryaddon'     , 'API\ItineraryController@updateItineraryAddon');
-    
-    
-    
-    
+
+
+
+
 
 
 
@@ -121,7 +121,7 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('gettheatreseat'     , 'API\TheatreController@getTheatreSeat');
     Route::any('gettheatrebyid'     , 'API\TheatreController@getTheatreById');
     Route::any('deletetheatrebyid'  , 'API\TheatreController@deleteTheatreById');
-    
+
 
 
     //All Global Setting Type Here
@@ -154,13 +154,9 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('updatemembership'     , 'API\GeneralController@updatemembership')->name('updatemembership');
     Route::any('deletemembership'     , 'API\GeneralController@deleteMembershipPlan')->name('deletemembership');
     Route::any('updatemembershipprice'     , 'API\GeneralController@updateMembershipPrice')->name('updatemembershipprice');
-    
-    
-
-
-
-
-
+    Route::any('gettaxlist'     , 'API\GeneralController@getTaxList')->name('gettaxlist');
+    Route::any('gettaxupdate'     , 'API\GeneralController@getTaxListUpdate')->name('gettaxupdate');
+    Route::any('gettaxdelete'     , 'API\GeneralController@getTaxListDelete')->name('gettaxdelete');
 
 });
 
@@ -198,8 +194,8 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('membershiplist'       , 'API\FrontController@getMembershipList')->name('membershiplist');
     Route::any('membershipbooking'    , 'API\OrderController@membershipBooking')->name('membershipbooking');
     Route::any('getgeneralpages'      , 'API\FrontController@getGeneralPages')->name('getgeneralpages');
-    
-    
+
+
 });
 
 
