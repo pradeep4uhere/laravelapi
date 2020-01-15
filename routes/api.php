@@ -158,6 +158,13 @@ Route::group(['prefix'=>'en/v1/', 'middleware' => ['auth:api','cors']],function 
     Route::any('gettaxupdate'     , 'API\GeneralController@getTaxListUpdate')->name('gettaxupdate');
     Route::any('gettaxdelete'     , 'API\GeneralController@getTaxListDelete')->name('gettaxdelete');
 
+    Route::any('getofferlist'     , 'API\GeneralController@getOfferList')->name('getofferlist');
+    Route::any('offerupdate'     , 'API\GeneralController@offerUpdate')->name('offerupdate');
+    Route::any('offerdelete'     , 'API\GeneralController@offerdelete')->name('offerdelete');
+    
+    
+    
+
 });
 
 

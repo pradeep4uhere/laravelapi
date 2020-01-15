@@ -21,6 +21,7 @@ use App\BannerGallery;
 use App\Setting;
 use App\Itinerary;
 use App\Tax;
+use App\Offer;
 
 class GeneralController extends MasterController
 {
@@ -313,9 +314,98 @@ class GeneralController extends MasterController
     }
 
 
+    
+
+    public function getOfferList(Request $request){
+        if($request->isMethod('post'))
+        {
+            if($request->get('id')>0){
+                $id = $request->get('id');
+                $sittingType = Offer::find($id);
+            }else{
+                $sittingType = Offer::get();
+                $newList= [];
+                foreach($sittingType as $k=>$item){
+                    if(time()> strtotime($item['valid_untill'])){
+                        $sittingType[$k]['expire']='Expire'; 
+                    }else{
+                        $sittingType[$k]['expire']='Active'; 
+                    }
+                }
+                #$sittingType = $newList;
+            }
+            $responseArray['status'] = 'success';
+            $responseArray['code'] = '200';
+            $responseArray['offerList'] = $sittingType;
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code'] = '500';
+            $responseArray['message'] = 'Invalid Requets';
+
+        }
+        return response()->json($responseArray, $this->successStatus);
+
+    }
+    
+
+    
+
+    public function offerUpdate(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id = $request->get('id');
+            if($id>0){
+                $sittingType = Offer::find($id);
+                $sittingType->offer_name = $request->get('offer_name');
+                $sittingType->offer_code = $request->get('offer_code');
+                $sittingType->offer_type = $request->get('offer_type');
+                $sittingType->offer_value = $request->get('offer_value');
+                if($request->get('valid_from')!=''){
+                    $sittingType->valid_from = date("Y-m-d H:i:s",strtotime($request->get('valid_from')));
+                }
+                if($request->get('valid_untill')!=''){
+                    $sittingType->valid_untill = date("Y-m-d H:i:s",strtotime($request->get('valid_untill')));
+                }
+                $sittingType->status = $request->get('status');
+            }else{
+
+                $sittingType = new Offer();
+                $sittingType['offer_name'] = $request->get('offer_name');
+                $sittingType['offer_code'] = $request->get('offer_code');
+                $sittingType['offer_type'] = $request->get('offer_type');
+                $sittingType['offer_value'] = $request->get('offer_value');
+                if($request->get('valid_from')!=''){
+                    $sittingType['valid_from'] = date("Y-m-d H:i:s",strtotime($request->get('valid_from')));
+                }
+                if($request->get('valid_untill')!=''){
+                    $sittingType['valid_untill'] = date("Y-m-d H:i:s",strtotime($request->get('valid_untill')));
+                }
+                $sittingType['status'] = $request->get('status');
+                $sittingType['created_at'] = self::getCreatedDate();
+            }
+            if($sittingType->save()){
+                $responseArray['status'] = 'success';
+                $responseArray['code'] = '200';
+                $responseArray['message'] = 'Coupon Updated Successfully.';
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+            }
+        }else{
+            $responseArray['status'] = 'error';
+            $responseArray['code'] = '500';
+            $responseArray['message'] = 'Invalid Requets';
+
+        }
+        return response()->json($responseArray, $this->successStatus);
+    }
 
 
-     public function getTaxList(Request $request){
+    
+    
+    
+    public function getTaxList(Request $request){
            if($request->isMethod('post'))
            {
                if($request->get('id')>0){
@@ -350,6 +440,7 @@ class GeneralController extends MasterController
                 $sittingType->value = $request->get('value');
                 $sittingType->status = $request->get('status');
             }else{
+
                 $sittingType = new Tax();
                 $sittingType['tax_type'] = $request->get('tax_type');
                 $sittingType['value'] = $request->get('value');
@@ -375,9 +466,41 @@ class GeneralController extends MasterController
     }
 
 
-
+    
 
   /*
+     * @New Review Viedos API
+     * @createdOn : 11 June 2019
+     */
+    public function offerdelete(Request $request){
+        if($request->isMethod('post'))
+        {
+            $id         = $request->get('id');
+            if($id>0){
+                $pageList = Offer::find($id);
+                if($pageList->delete()){
+                    $responseArray['status'] = 'success';
+                    $responseArray['code'] = '200';
+                    $responseArray['message'] = "Offer Type deleted.";
+                }else{
+                    $responseArray['status'] = 'error';
+                    $responseArray['code'] = '500';
+                    $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+                }
+            }else{
+                $responseArray['status'] = 'error';
+                $responseArray['code'] = '500';
+                $responseArray['message'] = 'Somthing went wrong!! Please try after sometime';
+
+            }
+            return response()->json($responseArray, $this->successStatus);
+        }
+    }
+
+
+
+
+    /*
      * @New Review Viedos API
      * @createdOn : 11 June 2019
      */
