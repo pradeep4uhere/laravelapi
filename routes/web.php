@@ -20,7 +20,7 @@ Route::get('/linknow', function () {
 	}
 });
 
-Route::get('test','LocationController@testPdf')->name('test');
+Route::get('emailview/{code}','API\EmailController@ViewEventBookingEmail')->name('emailview');
 Route::get('updatestatus/{id}/{status}','LocationController@updatestatus')->name('updatestatus');
 Route::get('deletelocation/{id}','LocationController@deletelocation')->name('deletelocation');
 Route::get('addnewlocation','LocationController@addnewlocation')->name('addnewlocation');

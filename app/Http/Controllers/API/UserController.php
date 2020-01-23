@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\MasterController;
+use App\Http\Controllers\API\EmailController;
 use Auth;
 use App\User;
 use Session;
@@ -18,10 +19,73 @@ use App\SittingType;
 use App\Theatre;
 use App\Price;
 use Carbon\Carbon;
+use Mail;
+use Illuminate\Contracts\Encryption\DecryptException;
 class UserController extends MasterController
 {
      
      public $successStatus = 200;
+
+
+
+     public function ChangePassword(Request $request){
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|confirmed|min:6',
+            'password_confirmation' => 'required|min:6'
+        ]);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $responseArray['status'] = false;
+            $responseArray['message']= "Input are not valid";
+            $responseArray['error']= $errors;
+        }else{
+            try{
+                $email = decrypt($request->get('token'));
+            }catch (DecryptException $e) {
+                $responseArray['status'] = false;
+                $responseArray['code'] = 500;
+                $responseArray['message'] = $e->getMessage().' Please try after sometime';
+                $responseArray['error']['password']= '';
+                return response()->json($responseArray);
+            }
+            $user = User::where('email','=',$email)->first();
+            if(!empty($user)){
+                $userObj = User::find($user->id);
+                $userObj->password = Hash::make($request->get('password'));
+                if($userObj->save()){
+                    $responseArray['code'] = 200;
+                    $responseArray['status'] = 'success';
+                    $responseArray['message'] = "Password has been change successfully, please login again.";
+                }else{
+                    $responseArray['code'] = 500;
+                    $responseArray['status'] = 'error';
+                    $responseArray['message'] = "Somthing went wrong, Please try after sometime";
+                }
+            }else{
+                $responseArray['code'] = 403;
+                $responseArray['status'] = 'error';
+                $responseArray['message'] = "Invalid URL or request, please try after sometime";
+            }
+
+        }
+        return response()->json($responseArray);
+     }
+
+
+
+
+
+
+     public function ResetEmail($user) {
+        EmailController::ResetEmail($user);
+     }
+
+     //Welcome Email
+     public function WelcomeEmail($user) {
+        EmailController::WelcomeEmail($user);
+     }
+
+
      /**
      *@Author       : Pradeep Kumar
      *@Description  : Register API 
@@ -60,6 +124,7 @@ class UserController extends MasterController
                     $userObj->save();
                     $last_insert_id = $userObj->id;
                     $userData   = User::find($userObj->id);
+                    $this->WelcomeEmail($userData);
                     //$this->sendEmail($last_insert_id,$request);
                     $userArr['id']      =   encrypt($userObj->id);
                     $userArr['name']    =   $userObj->first_name.' '.$userObj->last_name;
@@ -88,6 +153,7 @@ class UserController extends MasterController
 
 
     private function checkEmail($email) {
+        return true;
         $find1 = strpos($email, '@');
         $find2 = strpos($email, '.');
         return ($find1 !== false && $find2 !== false && $find2 > $find1);
@@ -100,6 +166,47 @@ class UserController extends MasterController
         return $setting;
     }
 
+
+    public function resetPassword(Request $request){
+        $responseArray = array();
+        if(self::isValidToekn($request)){
+            try{
+                    $validator = Validator::make($request->all(), [
+                        'username' => 'required',
+                    ]);
+                    if ($validator->fails()) {
+                        $errors = $validator->errors();
+                        $responseArray['status'] = 'success';
+                        $responseArray['message']= "Input are not valid";
+                        $responseArray['error']= $errors;
+                    }else{
+                            $email = $request->get('username');
+                            if ($this->checkEmail($email) ) {
+                                $user = User::where('email','=',$email)->first();
+                                if(!empty($user)){
+                                    $this->ResetEmail($user);
+                                    $responseArray['status'] = 'success';
+                                    $responseArray['message'] = "Pelase check your mailbox, link has been sent to your registred email.";
+                                }else{
+                                    $responseArray['status'] = 'error';
+                                    $responseArray['message'] = "This email address not register with us.";
+                                }
+                            }else{
+                                $responseArray['status'] = 'error';
+                                $responseArray['message'] = "This email address not valid.";
+                            }
+                    }
+
+            }catch (Exception $e) {
+                $responseArray['status'] = 'error';
+                $responseArray['message'] = $e->getMessage();
+            }
+        }else{
+            $responseArray = self::getInvalidTokenMsg();
+        }
+        return response()->json($responseArray);
+
+    }
 
 
     /**
@@ -505,7 +612,7 @@ class UserController extends MasterController
         }
 
 
-        private function getEventOrderInvoice($orderId){
+        public function getEventOrderInvoice($orderId){
             $setting = $this->getSetting();
             $orderDetails = Order::with('OrderStatus','TempSeatBooking')->where('orderId','=',$orderId)->first()->toArray();
             //print_r($orderDetails);die;

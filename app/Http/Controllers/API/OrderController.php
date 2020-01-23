@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\MasterController;
+use App\Http\Controllers\API\EmailController;
+
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use Session;
@@ -195,7 +197,9 @@ class OrderController extends MasterController
 			  $user['password']       = Hash::make($password);
 
 			  $id= User::create($user)->id;
-				$orderData['user_id']		= $id;
+  			  $orderData['user_id']		= $id;
+			  //Sending Welcome Email to User
+			  EmailController::WelcomeEmail($user);
 		  } catch (Exception $e) {
 			  $responseArray['status'] = false;
 			  $responseArray['code'] = 500;
@@ -300,6 +304,7 @@ class OrderController extends MasterController
 				if($request->get('user_id')){
 					$userID = $request->get('user_id');
 					$userArr= User::where('id','=',$userID)->get();
+					$user = $userArr;
 					if(count($userArr)>0){
 						$orderData['user_id']		= $userID;
 					}else{
@@ -325,7 +330,11 @@ class OrderController extends MasterController
                 $user['password']       = Hash::make($password);
 
                 $id= User::create($user)->id;
-              	$orderData['user_id']		= $id;
+				$orderData['user_id']		= $id;
+
+				//Sending Welcome Email to User
+				EmailController::WelcomeEmail($user);
+				  
             } catch (Exception $e) {
                 $responseArray['status'] = false;
                 $responseArray['code'] = 500;
@@ -334,8 +343,8 @@ class OrderController extends MasterController
             }
     	}
     	$orderData['orderID']			= time();
-			$orderData['order_status_id']	= '1';
-			$orderData['order_type']		= '1';
+		$orderData['order_status_id']	= '1';
+		$orderData['order_type']		= '1';
     	$orderData['email_address']		= $request->get('email');
     	$orderData['session']			= $request->get('user_id');
     	$orderData['order_date']		= date('Y-m-d H:i:s');
@@ -385,6 +394,11 @@ class OrderController extends MasterController
 	            $responseArray['message'] 	= "Order Creadted";
 	            $responseArray['order'] 	= $orderArr;
 				$responseArray['oid']       = encrypt($id);
+
+				//Send Booking Order Confiramtion to User and Admin
+				$setting = Setting::all()->toArray();
+				EmailController::EventBookingEmail($orderData['orderID']);
+				//echo "check "; die;
 				\Cart::session($request->get('user_id'))->clear();
 
 
@@ -395,6 +409,11 @@ class OrderController extends MasterController
         	}
         return response()->json($responseArray);
     }
+
+
+
+	
+
 
 
 

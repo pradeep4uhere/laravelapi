@@ -201,6 +201,10 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('membershiplist'       , 'API\FrontController@getMembershipList')->name('membershiplist');
     Route::any('membershipbooking'    , 'API\OrderController@membershipBooking')->name('membershipbooking');
     Route::any('getgeneralpages'      , 'API\FrontController@getGeneralPages')->name('getgeneralpages');
+    Route::any('resetpassword'        , 'API\UserController@resetPassword')->name('resetpassword');
+    Route::any('changepassword'       , 'API\UserController@ChangePassword')->name('changepassword');
+    
+    
 
 
 });

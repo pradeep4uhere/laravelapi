@@ -41,8 +41,9 @@ class MasterController extends Controller {
 	                }else{
 	                    $token = $val;
 	                }
-	            }
-	           //echo $str.config('global.CLIENT_SECRET');
+				}
+				//echo $token; '--';
+	            //echo $str.config('global.CLIENT_SECRET'); die;
 	           	$serverTotak = sha1($str.config('app.app_salt')); 
 	            if($token==$serverTotak){
 	                return true;

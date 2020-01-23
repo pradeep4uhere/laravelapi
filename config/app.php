@@ -136,6 +136,19 @@ return [
     |
     */
 
+
+     /*
+    |--------------------------------------------------------------------------
+    | From Email Address
+    |--------------------------------------------------------------------------
+    */
+    'mail_from_name' => env('MAIL_FROM_NAME'),
+    'phone_number' => env('PHONE_NO'),
+    'mail_from' => env('MAIL_FROM_ADDRESS'),
+    'site_url' => env('SITE_URL'),
+    'reset_password_link' => env('RESET_PASSWORD_URL'),
+    
+
     'providers' => [
 
         /*

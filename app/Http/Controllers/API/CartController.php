@@ -354,7 +354,7 @@ class CartController extends MasterController
 
 
 
-    private function getGst(){
+    public function getGst(){
         $tax['value'] = 0;
     	$tax = Tax::where('tax_type','=','GST')->where('status','=','1')->first();
     	return $tax['value'];
