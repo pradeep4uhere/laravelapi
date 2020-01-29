@@ -203,6 +203,8 @@ Route::group(['prefix'=>'front/en/v1/', 'middleware' => ['cors']],function () {
     Route::any('getgeneralpages'      , 'API\FrontController@getGeneralPages')->name('getgeneralpages');
     Route::any('resetpassword'        , 'API\UserController@resetPassword')->name('resetpassword');
     Route::any('changepassword'       , 'API\UserController@ChangePassword')->name('changepassword');
+    Route::any('userdetailsview'      , 'API\UserController@userDetailsView')->name('userdetailsview');
+    
     
     
 

@@ -100,6 +100,7 @@ class OrderController extends MasterController
 				//Save All Event Timing and Seats for this order
 				$orderArr = Order::find($id);
 			  if($this->saveMembershipPlanOrder($request,$id)){
+					EmailController::MemberShipBookingEmail($orderData['orderID']);
 					$responseArray['message'] 	= "Membership Order Completed.";
 				}else{
 					$responseArray['message'] 	= "Membership Order recived. we will sent you confirmation as soon as possible";
@@ -254,11 +255,15 @@ class OrderController extends MasterController
 			  //Save All Event Timing and Seats for this order
 			  $this->saveItineraryBooking($request,$id);
 			  $orderArr = Order::find($id);
+			 
 			  $responseArray['status']  	= true;
 			  $responseArray['code'] 	  	= 200;
 			  $responseArray['message'] 	= "Order Creadted";
 			  $responseArray['order'] 	= $orderArr;
 			  $responseArray['oid']       = encrypt($id);
+			  //$orderArr = Order::find($id)->toArray();
+			  EmailController::TravelBookingEmail($orderArr['orderID']);
+			  //echo "Ok"; die;
 			  \Cart::session($request->get('user_id'))->clear();
 	  }else{
 			  $responseArray['status'] = false;

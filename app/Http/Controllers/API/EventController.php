@@ -277,6 +277,13 @@ class EventController extends MasterController
     public function updateEventTiming(Request $request){
         $body = $request->get('body');
         $priceArr = $body['price'];
+        $theater_id = $body['theater_id'];
+        if(empty($theater_id)){
+            $responseArray['status'] = 'error';
+            $responseArray['code']= "500";
+            $responseArray['message']= "Theater Required, Please select theater."; 
+            return response()->json([$responseArray]); exit;
+        }
         if(empty($priceArr[0])){
             $responseArray['status'] = 'error';
             $responseArray['code']= "500";

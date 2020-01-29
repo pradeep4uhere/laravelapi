@@ -112,9 +112,23 @@ class DestinationController extends MasterController
             $destination->altitude = $destinationData['altitude'];
             $destination->climate = $destinationData['climate'];
             $destination->population = $destinationData['population'];
-            $destination->shopping = $destinationData['shopping'];
-            $destination->cuisine = $destinationData['cuisine'];
-            $destination->more_information = $destinationData['more'];
+            if($destinationData['shopping']!=''){
+                $destination->shopping = $destinationData['shopping'];
+            }else{
+                $destination->shopping = NULL;
+            }
+
+            if($destinationData['cuisine']!=''){
+                $destination->cuisine = $destinationData['cuisine'];
+            }else{
+                $destination->cuisine = NULL;
+            }
+
+            if($destinationData['more']!=''){
+                $destination->more_information = $destinationData['more'];
+            }else{
+                $destination->more_information = NULL;
+            }
             $destination->trip_type = $destinationData['trip_type'];
             $destination->status = $destinationData['status'];
 
@@ -160,9 +174,24 @@ class DestinationController extends MasterController
             $destination->altitude = $altitude;
             $destination->climate = $climate;
             $destination->population = $population;
-            $destination->shopping = $shopping;
-            $destination->more_information = $more;
-            $destination->cuisine = $cuisine;
+            
+            if($shopping!=''){ 
+                $destination->shopping = $shopping;
+            }else{
+                $destination->shopping = NULL;
+            }
+
+            if($more!=''){ 
+                $destination->more_information = $more;
+            }else{
+                $destination->more_information = NULL;
+            }
+
+            if($cuisine!=''){ 
+                $destination->cuisine = $cuisine;
+            }else{
+                $destination->cuisine = NULL;
+            }   
             $destination->status = $status;
             
             if($destination->save()){

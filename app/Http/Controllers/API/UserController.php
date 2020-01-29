@@ -27,6 +27,26 @@ class UserController extends MasterController
      public $successStatus = 200;
 
 
+     public function userDetailsView(Request $request){
+        $responseArray['status'] = false;
+        $responseArray['code'] = 500;
+        $responseArray['message'] = $e->getMessage().' Please try after sometime';
+        $id = $request->get('id');
+        $user = User::find($id);
+        if(!empty($user)){
+            $responseArray['status'] = true;
+            $responseArray['code'] = 200;
+            $responseArray['user']= $user;
+        }else{
+            $responseArray['status'] = false;
+            $responseArray['code'] = 500;
+            $responseArray['message'] = $e->getMessage().' Please try after sometime';
+        }
+        return response()->json($responseArray);
+
+     }
+
+
 
      public function ChangePassword(Request $request){
         $validator = Validator::make($request->all(), [
@@ -574,7 +594,7 @@ class UserController extends MasterController
 
 
 
-        private function getTravelOrderInvoice($orderId){
+        public function getTravelOrderInvoice($orderId){
             $setting = $this->getSetting();
             $orderId = $orderId;
             $orderDetails = Order::with('OrderStatus','TempSeatBooking','ItineraryBooking')->where('orderId','=',$orderId)->first()->toArray();
